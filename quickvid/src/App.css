@@ -1,42 +1,82 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.app-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f4f8;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.OptionsBtns {
+    background: linear-gradient(145deg, rgba(7,0,128,1) 0%, rgba(9,9,121,1) 28%, rgba(0,212,255,1) 95%);
+    box-shadow: 0px 0px 5px 2px rgba(0,212,255,1);
+    border: 1px;
+    border-radius: 15px;
+    max-width: 300px;
+    min-width: 250px;
+    max-height: 200px;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column; /* Stack the text vertically */
+    align-items: center; /* Center-align the text */
+    justify-content: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+    .OptionsBtns:hover {
+        box-shadow: 0px 0px 10px 3px rgba(0,212,255,1);
+        transform: scale(1.05);
+    }
+
+.OptionsBtnsTitle {
+    color: white;
+    font-size: 25px;
+    text-shadow: 0px 0px 2px black;
 }
 
-.card {
-  padding: 2em;
+.OptionsBtnsVM {
+    color: white;
+    font-size: 15px;
+    text-shadow: 0px 0px 2px black;
+    position: relative; /* Allow stacking above the circle */
 }
 
-.read-the-docs {
-  color: #888;
+.OptionsBtnsVMContainer {
+    display: flex;
+    align-items: center; /* Vertically align text with the circle */
+    position: relative;
+    margin-top: 30px;
 }
+
+.circle {
+    width: 40px; /* Diameter of the circle */
+    height: 40px;
+    opacity: 50%;
+    background: linear-gradient(145deg, rgba(250,255,0,1) 0%, rgba(121,9,9,1) 100%);
+    border-radius: 50%; /* Make it circular */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+.glow-button {
+    background: linear-gradient(145deg, rgba(7,0,128,1) 0%, rgba(9,9,121,1) 28%, rgba(0,212,255,1) 95%);
+    color: white;
+    padding: 15px 30px;
+    font-size: 16px;
+    border: 5px;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s;
+}
+
+    .glow-button:hover {
+        box-shadow: 0 8px 16px rgba(0, 123, 255, 0.5);
+        transform: translateY(-2px);
+    }
+
+    .glow-button:active {
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.5);
+        transform: translateY(0);
+    }
