@@ -12,6 +12,14 @@
   ],
   "routes": [
     {
+      "src": "/public/timer.mp3",
+      "dest": "/public/timer.mp3"
+    },
+    {
+      "src": "/public/TruenoBlack-mBYV.otf",
+      "dest": "/public/TruenoBlack-mBYV.otf"
+    },
+    {
       "src": "/public/(.*)",
       "dest": "/public/$1"
     }
