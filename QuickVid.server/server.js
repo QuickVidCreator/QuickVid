@@ -270,7 +270,14 @@ app.get('/download', async (req, res) => {
         //console.log('Audio duration:', duration, 'ms');
 
         // Get the video format (audio and video combined)
-        const info = await ytdl.getInfo(videoUrl);
+        const info = await ytdl.getInfo(videoUrl, {
+            requestOptions: {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+                },
+            },
+        });
+
         const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
 
         if (!format) {
@@ -281,9 +288,6 @@ app.get('/download', async (req, res) => {
         res.header('Content-Disposition', 'attachment; filename="video.mp4"');
         res.header('Content-Type', format.container === 'mp4' ? 'video/mp4' : 'application/octet-stream');
 
-        console.log("Combining video and audio...");
-
-        // Use FFmpeg to combine video and audio
         const videoStream = ytdl(videoUrl, { format: format });
         //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1 << 26, });
         //setTimeout(() => {
