@@ -10,6 +10,8 @@ const { PassThrough } = require('stream'); // Use require for consistency
 const app = express();
 const fontPath = "/public/TruenoBlack-mBYV.otf";
 
+const timerPath = path.join(__dirname, 'public', 'timer.mp3');
+
 // Function to convert readable stream to buffer
 const streamToBuffer = (readableStream) => {
     return new Promise((resolve, reject) => {
@@ -232,12 +234,12 @@ app.get('/download', async (req, res) => {
         const timelineBuffer13 = await streamToBuffer(Q6ATime);
         const timelineBuffer14 = await streamToBuffer(VideoOutroTime);
 
-        const timer = fs.createReadStream('/public/timer.mp3');
-        const timer2 = fs.createReadStream('/public/timer.mp3');
-        const timer3 = fs.createReadStream('/public/timer.mp3');
-        const timer4 = fs.createReadStream('/public/timer.mp3');
-        const timer5 = fs.createReadStream('/public/timer.mp3');
-        const timer6 = fs.createReadStream('/public/timer.mp3');
+        const timer = fs.createReadStream(timerPath);
+        const timer2 = fs.createReadStream(timerPath);
+        const timer3 = fs.createReadStream(timerPath);
+        const timer4 = fs.createReadStream(timerPath);
+        const timer5 = fs.createReadStream(timerPath);
+        const timer6 = fs.createReadStream(timerPath);
         const combinedStream = merge(VideoHookStream, Question1Stream);
         const combinedStream2 = merge(combinedStream, timer);
         const combinedStream3 = merge(combinedStream2, Question1AStream);
