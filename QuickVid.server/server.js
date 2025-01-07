@@ -10,8 +10,8 @@ const getMP3Duration = require('get-mp3-duration'); // Added this import
 const { PassThrough } = require('stream'); // Use require for consistency
 const app = express();
 const fontPath = "/public/TruenoBlack-mBYV.otf";
-
 const timerPath = path.join(__dirname, 'public', 'timer.mp3');
+console.log('FFmpeg binary path:', ffmpegPath);
 
 // Function to convert readable stream to buffer
 const streamToBuffer = (readableStream) => {

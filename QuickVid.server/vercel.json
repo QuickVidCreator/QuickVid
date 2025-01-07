@@ -10,6 +10,11 @@
       "use": "@vercel/static"
     }
   ],
+  "functions": {
+    "api/*": {
+      "includeFiles": [ "node_modules/ffmpeg-static/ffmpeg" ]
+    }
+  },
   "routes": [
     {
       "src": "/public/timer.mp3",
