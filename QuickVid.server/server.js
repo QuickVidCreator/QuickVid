@@ -299,7 +299,7 @@ app.get('/download', async (req, res) => {
         //    console.log('Stopping download after 55 seconds');
         //    videoStream.destroy(); // This stops the stream gracefully
         //}, 59000); // Timeout after 55 seconds
-        const outputFilePath = path.join(__dirname, 'output.mp4');
+        const outputFilePath = path.join('/tmp', 'output.mp4');
 
 
         // draw the texts
