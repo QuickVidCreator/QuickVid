@@ -3,18 +3,16 @@
   "builds": [
     {
       "src": "server.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [ "node_modules/ffmpeg-static/ffmpeg" ]
+      }
     },
     {
       "src": "public/*",
       "use": "@vercel/static"
     }
   ],
-  "functions": {
-    "api/*": {
-      "includeFiles": [ "node_modules/ffmpeg-static/ffmpeg" ]
-    }
-  },
   "routes": [
     {
       "src": "/public/timer.mp3",
