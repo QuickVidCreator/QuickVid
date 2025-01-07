@@ -28,8 +28,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="public\MyFont.ttf" />
     <Content Include="public\timer.mp3" />
-    <Content Include="public\TruenoBlack-mBYV.otf" />
     <Content Include="server.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
