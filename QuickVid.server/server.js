@@ -1,5 +1,6 @@
 const express = require('express');
 const ytdl = require('@distube/ytdl-core');
+const { createProxyAgent } = require('@distube/ytdl-core');  // Import createProxyAgent from distube's ytdl-core
 const gTTS = require('gtts');
 const ffmpegPath = require('ffmpeg-static');
 const { spawn } = require('child_process');
@@ -270,14 +271,18 @@ app.get('/download', async (req, res) => {
         //console.log('Audio duration:', duration, 'ms');
 
         // Get the video format (audio and video combined)
-        const info = await ytdl.getInfo(videoUrl, {
-            requestOptions: {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-                },
-            },
-        });
-
+        //const proxyUrl = "socks5://your-proxy-ip:port"; // Replace with a working SOCKS5 proxy	208.65.90.21
+        //const proxyUrl = "http://179.252.184.165";
+        //const proxyUrl = "socks5://208.65.90.21:4145";
+        //const agent = ytdl.createProxyAgent({ uri: 'http://5.189.133.192' });  // Replace with the desired proxy IP and port
+        //const agent = ytdl.createProxyAgent({ uri: 'http://179.252.184.165' });  // Replace with the desired proxy IP and port
+        //const agent = ytdl.createProxyAgent({ uri: 'http://123.30.154.171:7777' });  // Replace with the desired proxy IP and port
+        console.log("configuring proxy");
+        const agent = ytdl.createProxyAgent({ uri: 'http://152.26.229.42:9443' });  // Replace with the desired proxy IP and port
+        console.log("created proxy");
+        const info = await ytdl.getInfo(videoUrl, { agent });
+        console.log('Info retrieved:', info);
+        console.log("post proxy");
         const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
 
         if (!format) {
@@ -288,7 +293,7 @@ app.get('/download', async (req, res) => {
         res.header('Content-Disposition', 'attachment; filename="video.mp4"');
         res.header('Content-Type', format.container === 'mp4' ? 'video/mp4' : 'application/octet-stream');
 
-        const videoStream = ytdl(videoUrl, { format: format });
+        const videoStream = ytdl(videoUrl, { format: format, agent });
         //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1 << 26, });
         //setTimeout(() => {
         //    console.log('Stopping download after 55 seconds');
