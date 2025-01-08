@@ -271,10 +271,11 @@ app.get('/download', async (req, res) => {
 
         // Get the video format (audio and video combined)
         console.log("configuring proxy");
-        //const agent = ytdl.createProxyAgent({ uri: 'http://152.26.229.42:9443' });  // Replace with the desired proxy IP and port
+        const agent = ytdl.createProxyAgent({ uri: 'http://152.26.229.42:9443' });  // Replace with the desired proxy IP and port
+        //const agent = ytdl.createProxyAgent({ uri: 'http://72.10.160.93:28593' });  // Replace with the desired proxy IP and port
         console.log("created proxy");
-        //const info = await ytdl.getInfo(videoUrl, { agent });
-        const info = await ytdl.getInfo(videoUrl);
+        const info = await ytdl.getInfo(videoUrl, { agent });
+        //const info = await ytdl.getInfo(videoUrl);
         console.log('Info retrieved:', info);
         console.log("post proxy");
         const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
@@ -287,8 +288,8 @@ app.get('/download', async (req, res) => {
         res.header('Content-Disposition', 'attachment; filename="video.mp4"');
         res.header('Content-Type', format.container === 'mp4' ? 'video/mp4' : 'application/octet-stream');
 
-        //const videoStream = ytdl(videoUrl, { format: format, agent });
-        const videoStream = ytdl(videoUrl, { format: format});
+        const videoStream = ytdl(videoUrl, { format: format, agent });
+        //const videoStream = ytdl(videoUrl, { format: format});
 
         //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1 << 26, });
         //setTimeout(() => {
