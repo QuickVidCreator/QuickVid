@@ -352,7 +352,7 @@ app.get('/download', async (req, res) => {
             '-strict', 'experimental',   // Allow AAC codec usage
             //'-t', '60',                  // Set video duration to 60 seconds
             '-f', 'mp4',                 // Output format
-            '-max_muxing_queue_size', '1024', // Increase muxing queue size
+            '-max_muxing_queue_size', '4096', // Increase muxing queue size
             outputFilePath               // Write to the temporary file
         ], {
             stdio: [
