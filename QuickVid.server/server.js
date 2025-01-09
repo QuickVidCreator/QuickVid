@@ -90,7 +90,9 @@ const generateAnswers = async (text) => {
     currentTime = timeline;
     // Display the full version of the answer at the start
     const startTime = currentTime / 1000; // Convert ms to seconds
-    drawTextCommands += `drawtext=text='${text}':x=${answerLocationX}:y=${answerLocationY}:fontsize=70:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime}, ${startTime + (60 - startTime)})',`;
+    //drawTextCommands += `drawtext=text='${text}':x=${answerLocationX}:y=${answerLocationY}:fontsize=70:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime}, ${startTime + (60 - startTime)})',`;
+    drawTextCommands += `drawtext=text='${text}':x=${answerLocationX}:y=${answerLocationY}:fontsize=70:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime}, 65)',`;
+
 
     // Loop through each word and display them one by one
     for (const { word, duration } of durations) {
@@ -271,11 +273,11 @@ app.get('/download', async (req, res) => {
 
         // Get the video format (audio and video combined)
         console.log("configuring proxy");
-        const agent = ytdl.createProxyAgent({ uri: 'http://152.26.229.42:9443' });  // Replace with the desired proxy IP and port
+        //const agent = ytdl.createProxyAgent({ uri: 'http://152.26.229.42:9443' });  // Replace with the desired proxy IP and port
         //const agent = ytdl.createProxyAgent({ uri: 'http://72.10.160.93:28593' });  // Replace with the desired proxy IP and port
         console.log("created proxy");
-        const info = await ytdl.getInfo(videoUrl, { agent });
-        //const info = await ytdl.getInfo(videoUrl);
+        //const info = await ytdl.getInfo(videoUrl, { agent });
+        const info = await ytdl.getInfo(videoUrl);
         console.log('Info retrieved:', info);
         console.log("post proxy");
         const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
@@ -288,15 +290,16 @@ app.get('/download', async (req, res) => {
         res.header('Content-Disposition', 'attachment; filename="video.mp4"');
         res.header('Content-Type', format.container === 'mp4' ? 'video/mp4' : 'application/octet-stream');
 
-        const videoStream = ytdl(videoUrl, { format: format, agent });
+        //const videoStream = ytdl(videoUrl, { format: format, agent });
         //const videoStream = ytdl(videoUrl, { format: format});
 
-        //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1 << 26, });
+        const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1 << 120 });
         //setTimeout(() => {
         //    console.log('Stopping download after 55 seconds');
         //    videoStream.destroy(); // This stops the stream gracefully
         //}, 59000); // Timeout after 55 seconds
-        const outputFilePath = path.join('/tmp', 'output.mp4');
+        //const outputFilePath = path.join('/tmp', 'output.mp4');
+        const outputFilePath = path.join(__dirname, 'output.mp4');
 
 
         // draw the texts
@@ -343,14 +346,14 @@ app.get('/download', async (req, res) => {
         //const Question5Ans = `drawtext=text='${Question5A}':x=200:y=1600:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         //const Question6Ans = `drawtext=text='${Question6A}':x=200:y=1750:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         const ffmpeg = spawn(ffmpegPath, [
-            //'-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
+            '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
             '-i', 'pipe:3',              // Video stream input
             '-i', 'pipe:4',              // Audio input
             '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${VideoTitleSet},${QuestionNum1}, ${QuestionNum2}, ${QuestionNum3},${QuestionNum4}, ${QuestionNum5}, ${QuestionNum6}, ${hookDrawText}, ${Question1DrawText}, ${Question1ADrawText}, ${Question2DrawText}, ${Question2ADrawText}, ${Question3DrawText}, ${Question3ADrawText}, ${Question4DrawText}, ${Question4ADrawText}, ${Question5DrawText}, ${Question5ADrawText}, ${Question6DrawText}, ${Question6ADrawText}, ${VideoOutroDrawText}`, // Text overlay
             '-c:v', 'libx264',           // Video codec (H.264)
             '-c:a', 'aac',               // Audio codec (AAC)
             '-strict', 'experimental',   // Allow AAC codec usage
-            //'-t', '60',                  // Set video duration to 60 seconds
+            '-t', '60',                  // Set video duration to 60 seconds
             '-f', 'mp4',                 // Output format
             '-max_muxing_queue_size', '4096', // Increase muxing queue size
             outputFilePath               // Write to the temporary file
