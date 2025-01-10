@@ -9,7 +9,8 @@ const path = require('path');
 const getMP3Duration = require('get-mp3-duration'); // Added this import
 const { PassThrough } = require('stream'); // Use require for consistency
 const app = express();
-const fontPath = path.join(__dirname, 'public', 'MyFont.ttf');
+//const fontPath = path.join(__dirname, 'public', 'MyFont.ttf');
+const fontPath = path.join(__dirname, 'public', 'MyFont.ttf').replace(/\\/g, '/');
 const timerPath = path.join(__dirname, 'public', 'timer.mp3');
 
 // Function to convert readable stream to buffer
@@ -148,11 +149,11 @@ const merge = (...streams) => {
 };
 
 app.get('/download', async (req, res) => {
-    questionDrift = 5500;
-    currentTime = 0;
-    timeline = 0;
-    answerLocationX = 200;
-    answerLocationY = 1005;
+    ///questionDrift = 5500;
+    //currentTime = 0;
+    //timeline = 0;
+    //answerLocationX = 200;
+    //answerLocationY = 1005;
     const videoUrl = req.query.url;
     const VideoTitle = req.query.VideoTitle;
     const VideoHook = req.query.VideoHook;
@@ -283,10 +284,10 @@ app.get('/download', async (req, res) => {
         console.log("created proxy");
         //const info = await ytdl.getInfo(videoUrl, { agent });
         const info = await ytdl.getInfo(videoUrl);
-        console.log('Info retrieved:', info);
+        console.log(info);
         console.log("post proxy");
-        const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
 
+        const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo'});
         if (!format) {
             return res.status(400).send('No suitable format found.');
         }
@@ -298,11 +299,11 @@ app.get('/download', async (req, res) => {
         //const videoStream = ytdl(videoUrl, { format: format, agent });
         //const videoStream = ytdl(videoUrl, { format: format});
 
-        const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 4 });
-        //setTimeout(() => {
-        //    console.log('Stopping download after 55 seconds');
-        //    videoStream.destroy(); // This stops the stream gracefully
-        //}, 59000); // Timeout after 55 seconds
+        //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
+        const videoStream = ytdl(videoUrl, { fmt: "mp4" });
+        await new Promise((resolve) => {
+            videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
+        });
         //const outputFilePath = path.join('/tmp', 'output.mp4');
         const outputFilePath = path.join(__dirname, 'output.mp4');
 
@@ -353,6 +354,7 @@ app.get('/download', async (req, res) => {
         const ffmpeg = spawn(ffmpegPath, [
             '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
             '-i', 'pipe:3',              // Video stream input
+            '-thread_queue_size', '1024', // Increase thread queue for audio input
             '-i', 'pipe:4',              // Audio input
             '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${VideoTitleSet},${QuestionNum1}, ${QuestionNum2}, ${QuestionNum3},${QuestionNum4}, ${QuestionNum5}, ${QuestionNum6}, ${hookDrawText}, ${Question1DrawText}, ${Question1ADrawText}, ${Question2DrawText}, ${Question2ADrawText}, ${Question3DrawText}, ${Question3ADrawText}, ${Question4DrawText}, ${Question4ADrawText}, ${Question5DrawText}, ${Question5ADrawText}, ${Question6DrawText}, ${Question6ADrawText}, ${VideoOutroDrawText}`, // Text overlay
             '-c:v', 'libx264',           // Video codec (H.264)
