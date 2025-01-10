@@ -298,7 +298,7 @@ app.get('/download', async (req, res) => {
         //const videoStream = ytdl(videoUrl, { format: format, agent });
         //const videoStream = ytdl(videoUrl, { format: format});
 
-        const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1 << 120 });
+        const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1 << 200 });
         //setTimeout(() => {
         //    console.log('Stopping download after 55 seconds');
         //    videoStream.destroy(); // This stops the stream gracefully
