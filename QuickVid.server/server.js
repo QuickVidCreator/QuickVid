@@ -9,6 +9,10 @@ const path = require('path');
 const getMP3Duration = require('get-mp3-duration'); // Added this import
 const { PassThrough } = require('stream'); // Use require for consistency
 const app = express();
+app.use((req, res, next) => {
+    req.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
+    next();
+});
 //const fontPath = path.join(__dirname, 'public', 'MyFont.ttf');
 const fontPath = path.join(__dirname, 'public', 'MyFont.ttf').replace(/\\/g, '/');
 const timerPath = path.join(__dirname, 'public', 'timer.mp3');
@@ -284,7 +288,7 @@ app.get('/download', async (req, res) => {
         console.log("created proxy");
         //const info = await ytdl.getInfo(videoUrl, { agent });
         const info = await ytdl.getInfo(videoUrl);
-        console.log(info);
+        //console.log(info);
         console.log("post proxy");
 
         const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo'});
