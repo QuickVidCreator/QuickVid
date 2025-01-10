@@ -150,10 +150,10 @@ const merge = (...streams) => {
 
 app.get('/download', async (req, res) => {
     ///questionDrift = 5500;
-    //currentTime = 0;
-    //timeline = 0;
-    //answerLocationX = 200;
-    //answerLocationY = 1005;
+    currentTime = 0;
+    timeline = 0;
+    answerLocationX = 200;
+    answerLocationY = 1005;
     const videoUrl = req.query.url;
     const VideoTitle = req.query.VideoTitle;
     const VideoHook = req.query.VideoHook;
