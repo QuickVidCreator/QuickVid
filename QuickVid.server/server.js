@@ -357,7 +357,7 @@ app.get('/download', async (req, res) => {
         //const Question5Ans = `drawtext=text='${Question5A}':x=200:y=1600:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         //const Question6Ans = `drawtext=text='${Question6A}':x=200:y=1750:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         const ffmpeg = spawn(ffmpegPath, [
-            //'-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
+            '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
             '-i', 'pipe:3',              // Video stream input
             '-thread_queue_size', '1024', // Increase thread queue for audio input
             '-i', 'pipe:4',              // Audio input
@@ -365,7 +365,7 @@ app.get('/download', async (req, res) => {
             '-c:v', 'libx264',           // Video codec (H.264)
             '-c:a', 'aac',               // Audio codec (AAC)
             '-strict', 'experimental',   // Allow AAC codec usage
-            //'-t', '60',                  // Set video duration to 60 seconds
+            '-t', '60',                  // Set video duration to 60 seconds
             '-f', 'mp4',                 // Output format
             '-max_muxing_queue_size', '4096', // Increase muxing queue size
             outputFilePath               // Write to the temporary file
