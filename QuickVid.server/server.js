@@ -302,10 +302,10 @@ app.get('/download', async (req, res) => {
         res.header('Content-Type', format.container === 'mp4' ? 'video/mp4' : 'application/octet-stream');
 
         //const videoStream = ytdl(videoUrl, { format: format, agent });
-        const videoStream = ytdl(videoUrl, { format: format});
+        //const videoStream = ytdl(videoUrl, { format: format});
 
         //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
-        //const videoStream = ytdl(videoUrl, { fmt: "mp4" });
+        const videoStream = ytdl(videoUrl, { fmt: "mp4" });
         await new Promise((resolve) => {
             videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
         });
