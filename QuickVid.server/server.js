@@ -304,8 +304,8 @@ app.get('/download', async (req, res) => {
         //const videoStream = ytdl(videoUrl, { format: format, agent });
         //const videoStream = ytdl(videoUrl, { format: format});
 
-        //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
-        const videoStream = ytdl(videoUrl, { fmt: "mp4" });
+        const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
+        //const videoStream = ytdl(videoUrl, { fmt: "mp4" });
         await new Promise((resolve) => {
             videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
         });
@@ -365,7 +365,7 @@ app.get('/download', async (req, res) => {
             '-c:v', 'libx264',           // Video codec (H.264)
             '-c:a', 'aac',               // Audio codec (AAC)
             '-strict', 'experimental',   // Allow AAC codec usage
-            '-t', '60',                  // Set video duration to 60 seconds
+            //'-t', '60',                  // Set video duration to 60 seconds
             '-f', 'mp4',                 // Output format
             '-max_muxing_queue_size', '4096', // Increase muxing queue size
             outputFilePath               // Write to the temporary file
