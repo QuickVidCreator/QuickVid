@@ -11,6 +11,7 @@ const { PassThrough } = require('stream'); // Use require for consistency
 const app = express();
 app.use((req, res, next) => {
     req.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
+    res.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
     next();
 });
 //const fontPath = path.join(__dirname, 'public', 'MyFont.ttf');
