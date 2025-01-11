@@ -154,6 +154,7 @@ const merge = (...streams) => {
 };
 
 app.get('/download', async (req, res) => {
+    res.status(202).json({ message: "Video is being processed, check back soon." });
     ///questionDrift = 5500;
     currentTime = 0;
     timeline = 0;
