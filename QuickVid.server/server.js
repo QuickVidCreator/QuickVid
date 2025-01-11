@@ -302,9 +302,9 @@ app.get('/download', async (req, res) => {
         res.header('Content-Type', format.container === 'mp4' ? 'video/mp4' : 'application/octet-stream');
 
         //const videoStream = ytdl(videoUrl, { format: format, agent });
-        //const videoStream = ytdl(videoUrl, { format: format});
+        const videoStream = ytdl(videoUrl, { format: format});
 
-        const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
+        //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
         //const videoStream = ytdl(videoUrl, { fmt: "mp4" });
         await new Promise((resolve) => {
             videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
@@ -357,7 +357,7 @@ app.get('/download', async (req, res) => {
         //const Question5Ans = `drawtext=text='${Question5A}':x=200:y=1600:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         //const Question6Ans = `drawtext=text='${Question6A}':x=200:y=1750:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         const ffmpeg = spawn(ffmpegPath, [
-            '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
+            //'-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
             '-i', 'pipe:3',              // Video stream input
             '-thread_queue_size', '1024', // Increase thread queue for audio input
             '-i', 'pipe:4',              // Audio input
