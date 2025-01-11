@@ -153,8 +153,7 @@ const merge = (...streams) => {
     return pass;
 };
 
-app.get('/download', async (req, res) => {
-    res.send('Test message: Connection is working!');
+app.get('/api/download', async (req, res) => {
     ///questionDrift = 5500;
     currentTime = 0;
     timeline = 0;
