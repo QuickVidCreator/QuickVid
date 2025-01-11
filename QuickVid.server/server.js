@@ -364,6 +364,7 @@ app.get('/download', async (req, res) => {
             '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${VideoTitleSet},${QuestionNum1}, ${QuestionNum2}, ${QuestionNum3},${QuestionNum4}, ${QuestionNum5}, ${QuestionNum6}, ${hookDrawText}, ${Question1DrawText}, ${Question1ADrawText}, ${Question2DrawText}, ${Question2ADrawText}, ${Question3DrawText}, ${Question3ADrawText}, ${Question4DrawText}, ${Question4ADrawText}, ${Question5DrawText}, ${Question5ADrawText}, ${Question6DrawText}, ${Question6ADrawText}, ${VideoOutroDrawText}`, // Text overlay
             '-c:v', 'libx264',           // Video codec (H.264)
             '-c:a', 'aac',               // Audio codec (AAC)
+            '-preset', 'ultrafast',       // Use ultrafast encoding preset
             '-strict', 'experimental',   // Allow AAC codec usage
             '-t', '60',                  // Set video duration to 60 seconds
             '-f', 'mp4',                 // Output format
