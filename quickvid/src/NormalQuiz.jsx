@@ -44,15 +44,17 @@ const NormalQuiz = () => {
         setIsDownloading(true);
 
         try {
-            fetch('https://75.135.157.2:3000/download?url=https://www.youtube.com/watch?v=hgkgVKbIy_o&VideoTitle=TestTitle&VideoHook=TestHook&Question1=Q1&Question1A=Q1A&Question2=Q2&Question2A=Q2A&Question3=Q3&Question3A=Q3A&Question4=Q4&Question4A=Q4A&Question5=Q5&Question5A=Q5A&Question6=Q6&Question6A=Q6A&VideoOutro=TestOutro', {
+            const url = `https://75.135.157.2:3000/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
+
+            fetch(url, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json', // Still send the content-type, but don't expect JSON
+                    'Content-Type': 'application/json',
                 },
             })
                 .then(response => {
                     if (response.ok) {
-                        return response.blob();  // Get the binary file as a Blob
+                        return response.blob(); // Get the binary file as a Blob
                     } else {
                         throw new Error('Network response was not ok');
                     }
@@ -61,18 +63,12 @@ const NormalQuiz = () => {
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'video.mp4';  // Set the file name you want for the download
+                    a.download = 'video.mp4'; // Set the file name you want for the download
                     document.body.appendChild(a);
                     a.click();
-                    a.remove();  // Clean up the anchor element
+                    a.remove(); // Clean up the anchor element
                 })
                 .catch(error => console.error('Error:', error));
-            // Trigger the download by navigating to the server's /download endpoint with the video URL and Question1 input
-            //window.location.href = `http://75.135.157.2:3000/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
-            //const response = await fetch(`http://75.135.157.2:3000/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`);
-            //window.location.href = `http://localhost:4000/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
-            //window.location.href = `https://quickvidserver.vercel.app/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
-            //window.location.href = `https://quickvid.onrender.com/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
         } catch (error) {
             console.error('Error during download:', error);
             alert('An error occurred while downloading the video.');
@@ -80,6 +76,7 @@ const NormalQuiz = () => {
             setIsDownloading(false);
         }
     };
+
 
 
 
