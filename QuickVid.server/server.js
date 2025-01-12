@@ -1,4 +1,5 @@
 const express = require('express');
+const https = require('https');  // Import the https module
 const ytdl = require('@distube/ytdl-core');
 const { createProxyAgent } = require('@distube/ytdl-core');  // Import createProxyAgent from distube's ytdl-core
 const gTTS = require('gtts');
@@ -20,6 +21,8 @@ app.use(cors()); // Enable CORS
 //const fontPath = path.join(__dirname, 'public', 'MyFont.ttf');
 const fontPath = path.join(__dirname, 'public', 'MyFont.ttf').replace(/\\/g, '/');
 const timerPath = path.join(__dirname, 'public', 'timer.mp3');
+const cert = fs.readFileSync(path.join(__dirname, 'certificate.pem'));
+const key = fs.readFileSync(path.join(__dirname, 'key.pem'));
 
 // Function to convert readable stream to buffer
 const streamToBuffer = (readableStream) => {
@@ -452,6 +455,7 @@ app.get('/download', async (req, res) => {
     }
 });
 
-app.listen(4000, () => {
-    console.log('Server running on http://localhost:4000');
-});
+https.createServer({ key: key, cert: cert }, app)
+    .listen(4000, () => {
+        console.log('HTTPS server running on https://localhost:3000');
+    });

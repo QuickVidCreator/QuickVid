@@ -15,7 +15,8 @@
     "express": "^4.21.2",
     "ffmpeg-static": "^5.2.0",
     "get-mp3-duration": "^1.0.0",
-    "gtts": "^0.2.1"
+    "gtts": "^0.2.1",
+    "https": "^1.0.0"
   },
   "devDependencies": {
     "eslint": "^8.21.0"

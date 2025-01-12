@@ -44,7 +44,7 @@ const NormalQuiz = () => {
         setIsDownloading(true);
 
         try {
-            fetch('http://75.135.157.2:3000/download?url=https://www.youtube.com/watch?v=hgkgVKbIy_o&VideoTitle=TestTitle&VideoHook=TestHook&Question1=Q1&Question1A=Q1A&Question2=Q2&Question2A=Q2A&Question3=Q3&Question3A=Q3A&Question4=Q4&Question4A=Q4A&Question5=Q5&Question5A=Q5A&Question6=Q6&Question6A=Q6A&VideoOutro=TestOutro', {
+            fetch('https://75.135.157.2:3000/download?url=https://www.youtube.com/watch?v=hgkgVKbIy_o&VideoTitle=TestTitle&VideoHook=TestHook&Question1=Q1&Question1A=Q1A&Question2=Q2&Question2A=Q2A&Question3=Q3&Question3A=Q3A&Question4=Q4&Question4A=Q4A&Question5=Q5&Question5A=Q5A&Question6=Q6&Question6A=Q6A&VideoOutro=TestOutro', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json', // Still send the content-type, but don't expect JSON
