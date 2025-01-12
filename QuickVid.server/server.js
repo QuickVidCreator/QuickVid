@@ -9,7 +9,9 @@ const path = require('path');
 const getMP3Duration = require('get-mp3-duration'); // Added this import
 const { PassThrough } = require('stream'); // Use require for consistency
 const mime = require('mime-types');
+const cors = require('cors');
 const app = express();
+app.use(cors()); // Enable CORS
 app.use((req, res, next) => {
     req.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
     res.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
@@ -314,7 +316,7 @@ app.get('/download', async (req, res) => {
             videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
         });
         //const outputFilePath = path.join('/tmp', 'output.mp4');
-        const outputFilePath = path.join(__dirname, 'output.mp4');
+        const outputFilePath = path.join(__dirname, 'video.mp4');
 
 
         // draw the texts
@@ -424,10 +426,23 @@ app.get('/download', async (req, res) => {
 
             // Attempt to send the video file to the client, even if FFmpeg failed
             fs.stat(outputFilePath, (err, stats) => {
-                console.log("made it here");
-                const readStream = fs.createReadStream(outputFilePath);
-                readStream.pipe(res);
-                console.log(err);
+                if (err || !stats.isFile()) {
+                    console.error('Output file not found or inaccessible:', err);
+                    return res.status(500).send('Failed to generate video.');
+                }
+
+                // Send the file if it exists
+                res.sendFile(outputFilePath, (err) => {
+                //res.download(outputFilePath, 'video.mp4', (err) => {
+                    if (err) {
+                        console.error('Error sending file:', err);
+                    }
+
+                    // Cleanup temporary files after sending response
+                    fs.unlink(outputFilePath, (err) => {
+                        if (err) console.error('Error removing temporary output file:', err);
+                    });
+                });
             });
         });
 
