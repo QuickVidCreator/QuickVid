@@ -430,8 +430,11 @@ app.get('/download', async (req, res) => {
                 }
 
                 // Send the file if it exists
-                //res.sendFile(outputFilePath, (err) => {
-                res.download(outputFilePath, 'video.mp4', (err) => {
+                const readStream = fs.createReadStream(outputFilePath);
+                readStream.pipe(res);
+                console.log("CONTINUING");
+                res.sendFile(outputFilePath, (err) => {
+                //res.download(outputFilePath, 'video.mp4', (err) => {
                     if (err) {
                         console.error('Error sending file:', err);
                     }
