@@ -299,7 +299,9 @@ app.get('/download', async (req, res) => {
 
         // Set headers for video download
         res.header('Content-Disposition', 'attachment; filename="video.mp4"');
-        res.header('Content-Type', format.container === 'mp4' ? 'video/mp4' : 'application/octet-stream');
+        res.header('Content-Type', mime.lookup('mp4') || 'application/octet-stream');
+        res.header('Cache-Control', 'no-cache');
+        res.header('Connection', 'keep-alive'); // Prevents premature disconnect
 
 
         //const videoStream = ytdl(videoUrl, { format: format, agent });
