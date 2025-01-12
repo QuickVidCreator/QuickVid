@@ -427,6 +427,7 @@ app.get('/download', async (req, res) => {
                 console.log("made it here");
                 const readStream = fs.createReadStream(outputFilePath);
                 readStream.pipe(res);
+                console.log(err);
             });
         });
 
