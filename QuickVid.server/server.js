@@ -424,26 +424,9 @@ app.get('/download', async (req, res) => {
 
             // Attempt to send the video file to the client, even if FFmpeg failed
             fs.stat(outputFilePath, (err, stats) => {
-                if (err || !stats.isFile()) {
-                    console.error('Output file not found or inaccessible:', err);
-                    return res.status(500).send('Failed to generate video.');
-                }
-
-                // Send the file if it exists
+                console.log("made it here");
                 const readStream = fs.createReadStream(outputFilePath);
                 readStream.pipe(res);
-                console.log("CONTINUING");
-                res.sendFile(outputFilePath, (err) => {
-                //res.download(outputFilePath, 'video.mp4', (err) => {
-                    if (err) {
-                        console.error('Error sending file:', err);
-                    }
-
-                    // Cleanup temporary files after sending response
-                    fs.unlink(outputFilePath, (err) => {
-                        if (err) console.error('Error removing temporary output file:', err);
-                    });
-                });
             });
         });
 
