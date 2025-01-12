@@ -30,7 +30,7 @@ const NormalQuiz = () => {
             return;
         }
         if (!VideoHook) {
-            alert('Please enter a valid video hook');
+            alert('Please enter a valid video title');
             return;
         }
         if (!Question1 || !Question1A || !Question2 || !Question2A || !Question3 || !Question3A || !Question4 || !Question4A || !Question5 || !Question5A || !Question6 || !Question6A) {
@@ -41,47 +41,15 @@ const NormalQuiz = () => {
             alert('Please enter a valid video outro');
             return;
         }
-
         setIsDownloading(true);
 
         try {
-            // Get the API URL from the environment variable
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-            // Make the API call to the /api/download endpoint
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    url: videoUrl,
-                    VideoTitle,
-                    VideoHook,
-                    Question1,
-                    Question1A,
-                    Question2,
-                    Question2A,
-                    Question3,
-                    Question3A,
-                    Question4,
-                    Question4A,
-                    Question5,
-                    Question5A,
-                    Question6,
-                    Question6A,
-                    VideoOutro,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (data.fileUrl) {
-                // If the file was successfully created, you can trigger the download
-                window.location.href = data.fileUrl;
-            } else {
-                alert('An error occurred while downloading the video.');
-            }
+            // Trigger the download by navigating to the server's /download endpoint with the video URL and Question1 input
+            window.location.href = `http://75.135.157.2:3000/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
+            //const response = await fetch(`http://75.135.157.2:3000/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`);
+            //window.location.href = `http://localhost:4000/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
+            //window.location.href = `https://quickvidserver.vercel.app/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
+            //window.location.href = `https://quickvid.onrender.com/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
         } catch (error) {
             console.error('Error during download:', error);
             alert('An error occurred while downloading the video.');
@@ -89,7 +57,6 @@ const NormalQuiz = () => {
             setIsDownloading(false);
         }
     };
-
 
 
 

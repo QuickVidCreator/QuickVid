@@ -153,7 +153,7 @@ const merge = (...streams) => {
     return pass;
 };
 
-app.get('/api/download', async (req, res) => {
+app.get('/download', async (req, res) => {
     ///questionDrift = 5500;
     currentTime = 0;
     timeline = 0;
@@ -292,7 +292,7 @@ app.get('/api/download', async (req, res) => {
         //console.log(info);
         console.log("post proxy");
 
-        const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo'});
+        const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
         if (!format) {
             return res.status(400).send('No suitable format found.');
         }
