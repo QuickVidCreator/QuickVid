@@ -83,7 +83,7 @@ const NormalQuiz = () => {
             document.body.removeChild(link);
         } catch (error) {
             console.error('Error during download:', error);
-            alert('An error occurred while downloading the video.');
+            alert('An error occurred while downloading the video.' + error);
         } finally {
             setIsDownloading(false);
         }
