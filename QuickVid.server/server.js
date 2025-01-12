@@ -375,7 +375,7 @@ app.get('/download', async (req, res) => {
             '-c:a', 'aac',               // Audio codec (AAC)
             '-preset', 'ultrafast',       // Use ultrafast encoding preset
             '-strict', 'experimental',   // Allow AAC codec usage
-            '-t', '2',                  // Set video duration to 60 seconds
+            '-t', '60',                  // Set video duration to 60 seconds
             '-f', 'mp4',                 // Output format
             '-max_muxing_queue_size', '4096', // Increase muxing queue size
             outputFilePath               // Write to the temporary file
