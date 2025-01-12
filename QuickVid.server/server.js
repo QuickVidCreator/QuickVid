@@ -12,11 +12,11 @@ const mime = require('mime-types');
 const cors = require('cors');
 const app = express();
 app.use(cors()); // Enable CORS
-app.use((req, res, next) => {
-    req.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
-    res.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
-    next();
-});
+//app.use((req, res, next) => {
+    //req.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
+    //res.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
+    //next();
+//});
 //const fontPath = path.join(__dirname, 'public', 'MyFont.ttf');
 const fontPath = path.join(__dirname, 'public', 'MyFont.ttf').replace(/\\/g, '/');
 const timerPath = path.join(__dirname, 'public', 'timer.mp3');
