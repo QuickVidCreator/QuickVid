@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const getMP3Duration = require('get-mp3-duration'); // Added this import
 const { PassThrough } = require('stream'); // Use require for consistency
+const mime = require('mime-types');
 const app = express();
 app.use((req, res, next) => {
     req.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
