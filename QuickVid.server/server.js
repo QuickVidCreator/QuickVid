@@ -314,7 +314,16 @@ app.get('/download', async (req, res) => {
         //const videoStream = ytdl(videoUrl, { format: format});
 
         //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
-        const videoStream = ytdl(videoUrl, { fmt: "mp4" });
+        const clipStartTime = 60; // Start at 1 minute (60 seconds)
+        const clipDuration = 60; // Clip length (60 seconds)
+
+        const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
+
+        // Stop stream after 60 seconds
+        setTimeout(() => {
+            videoStream.destroy();
+            console.log("Snippet download stopped.");
+        }, clipDuration * 1000);
         await new Promise((resolve) => {
             videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
         });
