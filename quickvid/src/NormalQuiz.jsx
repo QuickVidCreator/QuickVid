@@ -91,7 +91,7 @@ const NormalQuiz = () => {
                 onChange={(e) => setVideoUrl(e.target.value)}
                 placeholder="Enter YouTube URL"
                 className="url-input" />
-            <h2 className="QATitles">Set the clip start time</h2>
+            <h2 className="QATitles">Set the clip start time (in seconds)</h2>
             <input
                 type="number"
                 value={videoStartTime}
