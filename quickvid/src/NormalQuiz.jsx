@@ -3,6 +3,7 @@ import './NormalQuiz.css'; // Import the CSS file
 
 const NormalQuiz = () => {
     const [videoUrl, setVideoUrl] = useState('');
+    const [videoStartTime, setVideoStartTime] = useState('');
     const [VideoTitle, setVideoTitle] = useState('');
     const [VideoHook, setVideoHook] = useState('');
     const [Question1, setQuestion1] = useState(''); // Updated variable name for user input
@@ -44,8 +45,7 @@ const NormalQuiz = () => {
         setIsDownloading(true);
 
         try {
-            //const url = `http://localhost:4000/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
-            const url = `https://75.135.157.2:3000/download?url=${encodeURIComponent(videoUrl)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
+            const url = `https://75.135.157.2:3000/download?url=${encodeURIComponent(videoUrl)}&VideoStartTime=${encodeURIComponent(videoStartTime)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
 
             fetch(url, {
                 method: 'GET',
@@ -91,6 +91,14 @@ const NormalQuiz = () => {
                 onChange={(e) => setVideoUrl(e.target.value)}
                 placeholder="Enter YouTube URL"
                 className="url-input" />
+            <h2 className="QATitles">Set the clip start time</h2>
+            <input
+                type="number"
+                value={videoStartTime}
+                onChange={(e) => setVideoStartTime(e.target.value)}
+                placeholder="Enter number"
+                min="0"
+                className="num-input" />
             <h2 className="QATitles">Set the video title</h2>
             <input
                 type="text"

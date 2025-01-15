@@ -38,6 +38,15 @@ body {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+.num-input {
+    max-width: 100px; /* Increase input width */
+    width: 80%; /* Make inputs responsive */
+    min-width: 70px;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
 
 /* Containers for Questions */
 .question-containers {

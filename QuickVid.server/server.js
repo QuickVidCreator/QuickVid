@@ -166,6 +166,7 @@ app.get('/download', async (req, res) => {
     answerLocationX = 200;
     answerLocationY = 1005;
     const videoUrl = req.query.url;
+    const videoStartTime = req.query.VideoStartTime;
     const VideoTitle = req.query.VideoTitle;
     const VideoHook = req.query.VideoHook;
     const Question1 = req.query.Question1; // Updated variable name to Question1
@@ -314,7 +315,8 @@ app.get('/download', async (req, res) => {
         //const videoStream = ytdl(videoUrl, { format: format});
 
         //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
-        const clipStartTime = 60; // Start at 1 minute (60 seconds)
+        const clipStartTime = 0; // Start at 1 minute (60 seconds)
+        const clipStartTime = VideoStartTime;
         const clipDuration = 60; // Clip length (60 seconds)
 
         const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
