@@ -315,7 +315,6 @@ app.get('/download', async (req, res) => {
         //const videoStream = ytdl(videoUrl, { format: format});
 
         //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
-        const clipStartTime = 0; // Start at 1 minute (60 seconds)
         const clipStartTime = VideoStartTime;
         const clipDuration = 60; // Clip length (60 seconds)
 
