@@ -68,7 +68,7 @@ const processQuestionsToWords = async (text) => {
         durations.push({ word, duration });
     }
     // Add an additional 5 seconds of duration
-    durations.push({ word: '', duration: questionDrift });
+    durations.push({ word: '', duration: 5500 });
     //questionDrift += 50;
 
     return durations;
@@ -174,7 +174,6 @@ async function processVideo(req, res) {
     ///questionDrift = 5500;
     currentTime = 0;
     timeline = 0;
-    let questionDrift = 5500;
     answerLocationX = 200;
     answerLocationY = 1005;
     const videoUrl = req.query.url;
