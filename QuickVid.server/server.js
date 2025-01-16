@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const getMP3Duration = require('get-mp3-duration'); // Added this import
 const { PassThrough } = require('stream'); // Use require for consistency
+
 const mime = require('mime-types');
 const cors = require('cors');
 const app = express();
@@ -160,6 +161,16 @@ const merge = (...streams) => {
 };
 
 app.get('/download', async (req, res) => {
+    try {
+        // Process the video and send the file
+        await processVideo(req, res);
+    } catch (err) {
+        console.error('Error in video processing:', err);
+        res.status(500).send('Error in processing video');
+    }
+});
+
+async function processVideo(req, res) {
     ///questionDrift = 5500;
     currentTime = 0;
     timeline = 0;
