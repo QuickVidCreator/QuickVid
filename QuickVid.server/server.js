@@ -54,7 +54,7 @@ const processTextToWords = async (text) => {
 };
 
 // Function to process questions into words, generate speech, and calculate durations
-let questionDrift = 5500;
+//let questionDrift = 5500;
 const processQuestionsToWords = async (text) => {
     const words = text.split(' ');
     const durations = [];
@@ -73,8 +73,8 @@ const processQuestionsToWords = async (text) => {
 
     return durations;
 };
-let currentTime = 0;
-let timeline = 0;
+//let currentTime = 0;
+//let timeline = 0;
 const generateText = async (text) => {
     const durations = await processTextToWords(text);
     currentTime = timeline;
@@ -94,8 +94,8 @@ const generateText = async (text) => {
     return drawTextCommands.trim().slice(0, -1);
 };
 
-let answerLocationX = 200;
-let answerLocationY = 1005;
+//let answerLocationX = 200;
+//let answerLocationY = 1005;
 const generateAnswers = async (text) => {
     const durations = await processTextToWords(text);
     let drawTextCommands = '';
@@ -174,6 +174,7 @@ async function processVideo(req, res) {
     ///questionDrift = 5500;
     currentTime = 0;
     timeline = 0;
+    let questionDrift = 5500;
     answerLocationX = 200;
     answerLocationY = 1005;
     const videoUrl = req.query.url;
@@ -340,8 +341,8 @@ async function processVideo(req, res) {
             videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
         });
         //const outputFilePath = path.join('/tmp', 'output.mp4');
-        const outputFilePath = path.join(__dirname, 'video.mp4');
-
+        //const outputFilePath = path.join(__dirname, 'video.mp4');
+        const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
 
         // draw the texts
         const hookDrawText = await generateText(VideoHook);
