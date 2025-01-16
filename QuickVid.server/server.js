@@ -474,7 +474,7 @@ async function processVideo(req, res) {
         console.error('Error processing request:', error);
         res.status(500).send('Error processing request.');
     }
-});
+};
 
 https.createServer({ key: key, cert: cert }, app)
     .listen(4000, () => {
