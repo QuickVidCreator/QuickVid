@@ -82,7 +82,7 @@
 }
 
 /* Media query for mobile devices */
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 900px) {
     .OptionsBtns {
         min-height: 120px; /* Slightly reduced height for mobile */
     }
@@ -103,7 +103,7 @@
 }
 
 /* Media query for larger mobile devices and tablets */
-@media screen and (min-width: 481px) and (max-width: 768px) {
+@media screen and (min-width: 901px) and (max-width: 1000px) {
     .OptionsBtns {
         width: 80%;
     }
