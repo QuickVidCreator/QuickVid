@@ -1,10 +1,12 @@
+/* Base styles - these apply to all screen sizes */
 .app-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh; /* Changed from height to min-height for better mobile handling */
     background-color: #f0f4f8;
+    padding: 20px; /* Added padding for breathing room on mobile */
 }
 
 .OptionsBtns {
@@ -12,71 +14,97 @@
     box-shadow: 0px 0px 5px 2px rgba(0,212,255,1);
     border: 1px;
     border-radius: 15px;
+    width: 90%; /* Changed to percentage for better responsiveness */
     max-width: 300px;
-    min-width: 250px;
-    max-height: 200px;
     min-height: 150px;
     display: flex;
-    flex-direction: column; /* Stack the text vertically */
-    align-items: center; /* Center-align the text */
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    padding: 15px; /* Added padding for content breathing room */
+    margin: 10px 0; /* Added margin for spacing between elements */
 }
 
     .OptionsBtns:hover {
         box-shadow: 0px 0px 10px 3px rgba(0,212,255,1);
-        transform: scale(1.05);
+        transform: scale(1.02); /* Reduced scale effect for mobile */
     }
 
 .OptionsBtnsTitle {
     color: white;
-    font-size: 25px;
+    font-size: clamp(18px, 5vw, 25px); /* Responsive font size */
     text-shadow: 0px 0px 2px black;
+    text-align: center; /* Ensure text stays centered */
 }
 
 .OptionsBtnsVM {
     color: white;
-    font-size: 15px;
+    font-size: clamp(14px, 4vw, 15px); /* Responsive font size */
     text-shadow: 0px 0px 2px black;
-    position: relative; /* Allow stacking above the circle */
+    position: relative;
+    text-align: center;
 }
 
 .OptionsBtnsVMContainer {
     display: flex;
-    align-items: center; /* Vertically align text with the circle */
+    align-items: center;
     position: relative;
-    margin-top: 30px;
+    margin-top: 20px;
+    width: 100%; /* Full width for better mobile layout */
+    justify-content: center;
 }
 
 .circle {
-    width: 40px; /* Diameter of the circle */
-    height: 40px;
+    width: 30px; /* Slightly smaller for mobile */
+    height: 30px;
     opacity: 50%;
     background: linear-gradient(145deg, rgba(250,255,0,1) 0%, rgba(121,9,9,1) 100%);
-    border-radius: 50%; /* Make it circular */
+    border-radius: 50%;
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%)
+    transform: translate(-50%, -50%);
 }
 
 .glow-button {
     background: linear-gradient(145deg, rgba(7,0,128,1) 0%, rgba(9,9,121,1) 28%, rgba(0,212,255,1) 95%);
     color: white;
-    padding: 15px 30px;
-    font-size: 16px;
+    padding: 12px 24px; /* Slightly reduced padding for mobile */
+    font-size: clamp(14px, 4vw, 16px); /* Responsive font size */
     border: 5px;
     border-radius: 15px;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease-in-out, transform 0.3s;
+    width: 100%; /* Full width on mobile */
+    max-width: 250px; /* Maximum width for larger screens */
+    margin: 10px 0;
 }
 
-    .glow-button:hover {
-        box-shadow: 0 8px 16px rgba(0, 123, 255, 0.5);
-        transform: translateY(-2px);
+/* Media query for mobile devices */
+@media screen and (max-width: 480px) {
+    .OptionsBtns {
+        min-height: 120px; /* Slightly reduced height for mobile */
     }
 
-    .glow-button:active {
-        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.5);
-        transform: translateY(0);
+    .OptionsBtnsVMContainer {
+        margin-top: 15px; /* Reduced margin for mobile */
     }
+
+    /* Disable hover effects on mobile */
+    .OptionsBtns:hover {
+        transform: none;
+    }
+
+    .glow-button:hover {
+        transform: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Media query for larger mobile devices and tablets */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .OptionsBtns {
+        width: 80%;
+    }
+}
