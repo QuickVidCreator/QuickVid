@@ -1,5 +1,7 @@
 const { processSixQuestionQuiz } = require('./sixquestionquiz.js');
-
+const cors = require('cors');
+const app = express();
+app.use(cors());
 app.get('/download', async (req, res) => {
     try {
         // Process the video and send the file
