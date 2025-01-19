@@ -33,6 +33,9 @@
   <ItemGroup>
     <Content Include="public\MyFont.ttf" />
     <Content Include="public\timer.mp3" />
+    <Content Include="redditstory.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="server.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />

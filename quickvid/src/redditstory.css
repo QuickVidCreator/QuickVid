@@ -1,0 +1,150 @@
+body {
+    display: flex;
+    margin: 0;
+    justify-content: center;
+    background: #000;
+    width: 100%; /* Ensure full viewport width */
+}
+
+.root, .App, .quiz-container {
+    max-width: 1500px;
+    width: 90%; /* Adjust width for responsiveness */
+    min-width: 700px;
+    box-sizing: border-box; /* Include padding and border in size */
+}
+
+.quiz-container {
+    margin: auto;
+    text-align: center;
+    max-width: 90%; /* Increased max-width for wider layout */
+    width: 100%; /* Ensures the container scales with viewport */
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center child elements horizontally */
+}
+
+.QuestionQuizTitle {
+    color: azure;
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.url-input, .text-input {
+    max-width: 300px; /* Increase input width */
+    width: 80%; /* Make inputs responsive */
+    min-width: 220px;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.num-input {
+    max-width: 100px; /* Increase input width */
+    width: 80%; /* Make inputs responsive */
+    min-width: 70px;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Containers for Questions */
+.question-containers {
+    display: flex;
+    gap: 80px; /* Adjust spacing between items for a wider layout */
+    align-items: center;
+    justify-content: space-around; /* Distribute items evenly */
+    margin: 10px 0; /* Increased margin for spacing */
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+}
+
+/* Individual Question Styles */
+.Question1, .Question1A,
+.Question2, .Question2A,
+.Question3, .Question3A,
+.Question4, .Question4A {
+    font-size: 26px; /* Slightly larger font for emphasis */
+    color: #fff;
+    background: rgba(40, 167, 69, 0.7);
+    padding: 20px; /* Increase padding for a more spacious look */
+    border-radius: 8px;
+    margin: 15px; /* Adjusted margins for consistency */
+    text-align: center;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+    width: 40%; /* Maintain percentage width */
+    max-width: 300px; /* Ensure elements don't get too wide */
+    min-width: 150px; /* Prevent elements from becoming too narrow */
+    box-sizing: border-box; /* Ensure consistent sizing */
+}
+/*.question1Title, question1ATitle,
+.question2Title, question2ATitle,
+.question3Title, question3ATitle,
+.question4Title, question4ATitle {
+    margin: 0px 0;
+}*/
+.QATitles {
+    margin: 5px 0;
+    color: rgba(0,212,255,1);
+}
+/* Download Button */
+.download-button {
+    padding: 15px 30px; /* Larger button */
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-size: 18px; /* Larger font for better visibility */
+}
+
+    .download-button:hover {
+        background-color: #218838;
+    }
+
+    .download-button.disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+/* Media Queries for Responsiveness */
+@media (max-width: 1200px) {
+    .question1-container,
+    .question2-container,
+    .question3-container,
+    .question4-container {
+        gap: 40px; /* Reduce spacing for medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .question1-container,
+    .question2-container,
+    .question3-container,
+    .question4-container {
+        justify-content: center; /* Center items */
+    }
+
+    .Question1, .Question1A,
+    .Question2, .Question2A,
+    .Question3, .Question3A,
+    .Question4, .Question4A {
+        width: 90%; /* Full width for smaller screens */
+    }
+
+    .url-input, .text-input {
+        width: 90%; /* Full width for input fields */
+    }
+}
+
+@media (max-width: 480px) {
+    .QuestionQuizTitle {
+        font-size: 20px; /* Reduce title font size for small screens */
+    }
+
+    .download-button {
+        font-size: 16px; /* Adjust button font size */
+        padding: 10px 20px;
+    }
+}

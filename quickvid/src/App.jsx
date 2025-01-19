@@ -16,9 +16,13 @@ const App = () => {
                                 <Link to="/feature">
                                     <button className="OptionsBtns">
                                         <span className="OptionsBtnsTitle">6 Question Quiz</span>
-                                        <div className="OptionsBtnsVMContainer">
-                                            <span className="circle"></span>
-                                            <span className="OptionsBtnsVM">5/10</span>
+                                        <div className="OptionsBtnsStatsContainer">
+                                            <img src="timerimage.png" width="30" height="30" />
+                                        </div>
+                                        <div className="OptionsBtnsPlatformsContainer">
+                                            <img src="youtubelogo.png" width="25" height="25" />
+                                            <img src="tiktoklogo.png" width="25" height="25" />
+                                            <img src="instagramlogo.png" width="25" height="25" />
                                         </div>
                                     </button>
                                 </Link>

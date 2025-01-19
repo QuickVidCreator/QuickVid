@@ -8,7 +8,15 @@
     background-color: #f0f4f8;
     padding: 20px; /* Added padding for breathing room on mobile */
 }
-
+.root, .App, .quiz-container {
+    max-width: 1500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    min-width: 700px;
+    box-sizing: border-box;
+}
 .OptionsBtns {
     background: linear-gradient(145deg, rgba(7,0,128,1) 0%, rgba(9,9,121,1) 28%, rgba(0,212,255,1) 95%);
     box-shadow: 0px 0px 5px 2px rgba(0,212,255,1);
@@ -37,35 +45,20 @@
     text-align: center; /* Ensure text stays centered */
 }
 
-.OptionsBtnsVM {
-    color: white;
-    font-size: clamp(14px, 4vw, 15px); /* Responsive font size */
-    text-shadow: 0px 0px 2px black;
-    position: relative;
-    text-align: center;
-}
-
-.OptionsBtnsVMContainer {
+.OptionsBtnsStatsContainer {
     display: flex;
     align-items: center;
     position: relative;
     margin-top: 20px;
+    margin-bottom: 20px;
     width: 100%; /* Full width for better mobile layout */
     justify-content: center;
 }
-
-.circle {
-    width: 30px; /* Slightly smaller for mobile */
-    height: 30px;
-    opacity: 50%;
-    background: linear-gradient(145deg, rgba(250,255,0,1) 0%, rgba(121,9,9,1) 100%);
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.OptionsBtnsPlatformsContainer {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
 }
-
 .glow-button {
     background: linear-gradient(145deg, rgba(7,0,128,1) 0%, rgba(9,9,121,1) 28%, rgba(0,212,255,1) 95%);
     color: white;
@@ -82,7 +75,7 @@
 }
 
 /* Media query for mobile devices */
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 480px) {
     .OptionsBtns {
         min-height: 120px; /* Slightly reduced height for mobile */
     }
@@ -103,7 +96,7 @@
 }
 
 /* Media query for larger mobile devices and tablets */
-@media screen and (min-width: 901px) and (max-width: 1000px) {
+@media screen and (min-width: 481px) and (max-width: 768px) {
     .OptionsBtns {
         width: 80%;
     }
