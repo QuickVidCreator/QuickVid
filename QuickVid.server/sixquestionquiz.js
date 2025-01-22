@@ -161,6 +161,25 @@ const merge = (...streams) => {
 };
 
 async function processSixQuestionQuiz(req, res) {
+    const {
+        videoUrl,
+        videoStartTime,
+        VideoTitle,
+        VideoHook,
+        Question1,
+        Question1A,
+        Question2,
+        Question2A,
+        Question3,
+        Question3A,
+        Question4,
+        Question4A,
+        Question5,
+        Question5A,
+        Question6,
+        Question6A,
+        VideoOutro,
+    } = req.body;  // Change this from req.query to req.body
     ///questionDrift = 5500;
     currentTime = 0;
     timeline = 0;

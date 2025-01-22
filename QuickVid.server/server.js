@@ -5,6 +5,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const app = express();
+app.use(express.json());
 app.use(cors());
 const cert = fs.readFileSync(path.join(__dirname, 'certificate.pem'));
 const key = fs.readFileSync(path.join(__dirname, 'key.pem'));
@@ -19,6 +20,6 @@ app.post('/download', async (req, res) => {
 });
 
 https.createServer({ key: key, cert: cert }, app)
-    .listen(4000, () => {
+    .listen(3000, () => {
         console.log('HTTPS server running on https://localhost:3000');
     });
