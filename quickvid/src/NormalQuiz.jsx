@@ -45,38 +45,50 @@ const NormalQuiz = () => {
         setIsDownloading(true);
 
         try {
-            const url = `https://75.135.157.2:3000/download?url=${encodeURIComponent(videoUrl)}&VideoStartTime=${encodeURIComponent(videoStartTime)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
-
-            fetch(url, {
-                method: 'GET',
+            const response = await fetch('https://75.135.157.2:3000/download', {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.blob(); // Get the binary file as a Blob
-                    } else {
-                        throw new Error('Network response was not ok');
-                    }
+                body: JSON.stringify({
+                    videoUrl,
+                    videoStartTime,
+                    VideoTitle,
+                    VideoHook,
+                    Question1,
+                    Question1A,
+                    Question2,
+                    Question2A,
+                    Question3,
+                    Question3A,
+                    Question4,
+                    Question4A,
+                    Question5,
+                    Question5A,
+                    Question6,
+                    Question6A,
+                    VideoOutro
                 })
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'video.mp4'; // Set the file name you want for the download
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove(); // Clean up the anchor element
-                })
-                .catch(error => console.error('Error:', error));
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'video.mp4';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
         } catch (error) {
             console.error('Error during download:', error);
             alert('An error occurred while downloading the video.');
         } finally {
             setIsDownloading(false);
         }
-    };
 
 
 
