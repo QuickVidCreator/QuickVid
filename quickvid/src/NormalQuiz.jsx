@@ -50,6 +50,7 @@ const NormalQuiz = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',  // Add this line
                 body: JSON.stringify({
                     videoUrl,
                     videoStartTime,
