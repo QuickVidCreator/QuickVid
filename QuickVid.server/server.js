@@ -5,14 +5,13 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-app.use(express.json());
 app.use(cors());
 const cert = fs.readFileSync(path.join(__dirname, 'certificate.pem'));
 const key = fs.readFileSync(path.join(__dirname, 'key.pem'));
 
-app.post('/download', async (req, res) => {
+app.get('/download', async (req, res) => {
     try {
-        console.log("here");
+        // Process the video and send the file
         await processSixQuestionQuiz(req, res);
     } catch (err) {
         console.error('Error in video processing:', err);
