@@ -89,6 +89,7 @@ const NormalQuiz = () => {
         } finally {
             setIsDownloading(false);
         }
+    };
 
 
 
