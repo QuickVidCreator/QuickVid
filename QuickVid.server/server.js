@@ -5,13 +5,14 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const app = express();
+app.use(express.json());
 app.use(cors());
 const cert = fs.readFileSync(path.join(__dirname, 'certificate.pem'));
 const key = fs.readFileSync(path.join(__dirname, 'key.pem'));
 
-app.get('/download', async (req, res) => {
+app.post('/download', async (req, res) => {
     try {
-        // Process the video and send the file
+        console.log("here");
         await processSixQuestionQuiz(req, res);
     } catch (err) {
         console.error('Error in video processing:', err);
@@ -20,6 +21,6 @@ app.get('/download', async (req, res) => {
 });
 
 https.createServer({ key: key, cert: cert }, app)
-    .listen(3000, () => {
+    .listen(4000, () => {
         console.log('HTTPS server running on https://localhost:3000');
     });
