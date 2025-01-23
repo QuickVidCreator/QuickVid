@@ -51,6 +51,7 @@ const NormalQuiz = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    videoType: 'sixQuestionQuiz',
                     videoUrl,
                     videoStartTime,
                     VideoTitle,

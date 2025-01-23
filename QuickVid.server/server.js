@@ -12,8 +12,18 @@ const key = fs.readFileSync(path.join(__dirname, 'key.pem'));
 
 app.post('/download', async (req, res) => {
     try {
-        console.log("REQUESTED");
-        await processSixQuestionQuiz(req, res);
+        const { videoType } = req.body;
+
+        switch (videoType) {
+            case 'sixQuestionQuiz':
+                await processSixQuestionQuiz(req, res);
+                break;
+            case 'redditStory':
+                await processUserTextVideo(req, res);
+                break;
+            default:
+                res.status(400).send('Invalid video type');
+        }
     } catch (err) {
         console.error('Error in video processing:', err);
         res.status(500).send('Error in processing video');
