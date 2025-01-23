@@ -346,7 +346,7 @@ async function processSixQuestionQuiz(req, res) {
         //const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
         const videoStream = ytdl(videoUrl, {
             fmt: "mp4",
-            filter: 'videoonly',
+            filter: format => format.codecs.includes('avc1') && !format.audioBitrate,
             begin: `${clipStartTime}s`
         });
         //const videoStream = ytdl(videoUrl, {
