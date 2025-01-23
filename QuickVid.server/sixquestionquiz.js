@@ -325,9 +325,9 @@ async function processSixQuestionQuiz(req, res) {
         //    quality: 'highestvideo',
         //    container: 'mp4'
         //});
-        if (!format) {
-            return res.status(400).send('No suitable format found.');
-        }
+        //if (!format) {
+            //return res.status(400).send('No suitable format found.');
+        //}
 
         // Set headers for video download
         res.header('Content-Disposition', 'attachment; filename="video.mp4"');
@@ -346,9 +346,14 @@ async function processSixQuestionQuiz(req, res) {
         //const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
         const videoStream = ytdl(videoUrl, {
             fmt: "mp4",
-            quality: 'highestvideo',
+            filter: 'videoonly',
             begin: `${clipStartTime}s`
         });
+        //const videoStream = ytdl(videoUrl, {
+        //    fmt: "mp4",
+        //    quality: 'highestvideo',
+        //    begin: `${clipStartTime}s`
+        //});
         //const videoStream = ytdl(videoUrl, {
         //    format: format,
         //    begin: `${clipStartTime}s`,
