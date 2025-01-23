@@ -321,10 +321,10 @@ async function processSixQuestionQuiz(req, res) {
         console.log("post proxy");
 
         //const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
-        const format = ytdl.chooseFormat(info.formats, {
-            quality: 'highestvideo',
-            container: 'mp4'
-        });
+        //const format = ytdl.chooseFormat(info.formats, {
+        //    quality: 'highestvideo',
+        //    container: 'mp4'
+        //});
         if (!format) {
             return res.status(400).send('No suitable format found.');
         }
@@ -345,10 +345,15 @@ async function processSixQuestionQuiz(req, res) {
 
         //const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
         const videoStream = ytdl(videoUrl, {
-            format: format,
-            begin: `${clipStartTime}s`,
-            highWaterMark: 1024 * 1024 * 32  // 32MB buffer
+            fmt: "mp4",
+            quality: 'highestvideo',
+            begin: `${clipStartTime}s`
         });
+        //const videoStream = ytdl(videoUrl, {
+        //    format: format,
+        //    begin: `${clipStartTime}s`,
+        //    highWaterMark: 1024 * 1024 * 32  // 32MB buffer
+        //});
         // Stop stream after 60 seconds
         setTimeout(() => {
             videoStream.destroy();
