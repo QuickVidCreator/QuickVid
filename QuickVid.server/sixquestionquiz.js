@@ -321,13 +321,13 @@ async function processSixQuestionQuiz(req, res) {
         console.log("post proxy");
 
         //const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
-        //const format = ytdl.chooseFormat(info.formats, {
-        //    quality: 'highestvideo',
-        //    container: 'mp4'
-        //});
-        //if (!format) {
-            //return res.status(400).send('No suitable format found.');
-        //}
+        const format = ytdl.chooseFormat(info.formats, {
+            quality: 'highestvideo',
+            container: 'mp4'
+        });
+        if (!format) {
+            return res.status(400).send('No suitable format found.');
+        }
 
         // Set headers for video download
         res.header('Content-Disposition', 'attachment; filename="video.mp4"');
@@ -344,22 +344,22 @@ async function processSixQuestionQuiz(req, res) {
         const clipDuration = 60; // Clip length (60 seconds)
 
         //const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
-        const videoStream = ytdl(videoUrl, {
-            fmt: "mp4",
-            filter: 'videoonly',
-            begin: `${clipStartTime}s`,
-            highWaterMark: 1024 * 1024 * 32  // 32MB buffer
-        });
         //const videoStream = ytdl(videoUrl, {
         //    fmt: "mp4",
-        //    quality: 'highestvideo',
-        //    begin: `${clipStartTime}s`
-        //});
-        //const videoStream = ytdl(videoUrl, {
-        //    format: format,
+        //    filter: 'videoonly',
         //    begin: `${clipStartTime}s`,
         //    highWaterMark: 1024 * 1024 * 32  // 32MB buffer
         //});
+        //const videoStream = ytdl(videoUrl, {
+            //fmt: "mp4",
+            //quality: 'lowestvideo',
+            //begin: `${clipStartTime}s`,
+            //highWaterMark: 1024 * 1024 * 32  // 32MB buffer
+        //});
+        const videoStream = ytdl(videoUrl, {
+            format: format,
+            begin: `${clipStartTime}s`,
+        });
         // Stop stream after 60 seconds
         setTimeout(() => {
             videoStream.destroy();
