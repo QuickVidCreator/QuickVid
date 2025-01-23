@@ -12,8 +12,8 @@ const { PassThrough } = require('stream'); // Use require for consistency
 
 const mime = require('mime-types');
 const cors = require('cors');
-app.use(express.json());  // Add this line
 const app = express();
+app.use(express.json());  // Add this line
 app.use(cors()); // Enable CORS
 //app.use((req, res, next) => {
 //req.setTimeout(300000); // Set timeout to 5 minutes (300000 ms)
@@ -320,7 +320,11 @@ async function processSixQuestionQuiz(req, res) {
         //console.log(info);
         console.log("post proxy");
 
-        const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
+        //const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
+        const format = ytdl.chooseFormat(info.formats, {
+            quality: 'highestvideo',
+            filter: (format) => format.container === 'mp4'
+        });
         if (!format) {
             return res.status(400).send('No suitable format found.');
         }
@@ -339,8 +343,11 @@ async function processSixQuestionQuiz(req, res) {
         const clipStartTime = videoStartTime;
         const clipDuration = 60; // Clip length (60 seconds)
 
-        const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
-
+        //const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
+        const videoStream = ytdl(videoUrl, {
+            format: format, // Use the custom format here
+            begin: `${clipStartTime}s` // Set the start time for the clip
+        });
         // Stop stream after 60 seconds
         setTimeout(() => {
             videoStream.destroy();
