@@ -345,8 +345,9 @@ async function processSixQuestionQuiz(req, res) {
 
         //const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
         const videoStream = ytdl(videoUrl, {
-            format: format, // Use the custom format here
-            begin: `${clipStartTime}s` // Set the start time for the clip
+            format: format,
+            begin: `${clipStartTime}s`,
+            highWaterMark: 1024 * 1024 * 32  // 32MB buffer
         });
         // Stop stream after 60 seconds
         setTimeout(() => {
