@@ -12,6 +12,7 @@ const { PassThrough } = require('stream'); // Use require for consistency
 
 const mime = require('mime-types');
 const cors = require('cors');
+app.use(express.json());  // Add this line
 const app = express();
 app.use(cors()); // Enable CORS
 //app.use((req, res, next) => {
@@ -161,28 +162,47 @@ const merge = (...streams) => {
 };
 
 async function processSixQuestionQuiz(req, res) {
+    const {
+        videoUrl,
+        videoStartTime,
+        VideoTitle,
+        VideoHook,
+        Question1,
+        Question1A,
+        Question2,
+        Question2A,
+        Question3,
+        Question3A,
+        Question4,
+        Question4A,
+        Question5,
+        Question5A,
+        Question6,
+        Question6A,
+        VideoOutro,
+    } = req.body;
     ///questionDrift = 5500;
     currentTime = 0;
     timeline = 0;
     answerLocationX = 200;
     answerLocationY = 1005;
-    const videoUrl = req.query.url;
-    const videoStartTime = req.query.VideoStartTime;
-    const VideoTitle = req.query.VideoTitle;
-    const VideoHook = req.query.VideoHook;
-    const Question1 = req.query.Question1; // Updated variable name to Question1
-    const Question1A = req.query.Question1A; // Updated variable name to Question1
-    const Question2 = req.query.Question2; // Updated variable name to Question1
-    const Question2A = req.query.Question2A; // Updated variable name to Question1
-    const Question3 = req.query.Question3; // Updated variable name to Question1
-    const Question3A = req.query.Question3A; // Updated variable name to Question1
-    const Question4 = req.query.Question4; // Updated variable name to Question1
-    const Question4A = req.query.Question4A; // Updated variable name to Question1
-    const Question5 = req.query.Question5; // Updated variable name to Question1
-    const Question5A = req.query.Question5A; // Updated variable name to Question1
-    const Question6 = req.query.Question6; // Updated variable name to Question1
-    const Question6A = req.query.Question6A; // Updated variable name to Question1
-    const VideoOutro = req.query.VideoOutro; // Updated variable name to Question1
+    //const videoUrl = req.query.url;
+    //const videoStartTime = req.query.VideoStartTime;
+    //const VideoTitle = req.query.VideoTitle;
+    //const VideoHook = req.query.VideoHook;
+    //const Question1 = req.query.Question1; // Updated variable name to Question1
+    //const Question1A = req.query.Question1A; // Updated variable name to Question1
+    //const Question2 = req.query.Question2; // Updated variable name to Question1
+    //const Question2A = req.query.Question2A; // Updated variable name to Question1
+    //const Question3 = req.query.Question3; // Updated variable name to Question1
+    //const Question3A = req.query.Question3A; // Updated variable name to Question1
+    //const Question4 = req.query.Question4; // Updated variable name to Question1
+    //const Question4A = req.query.Question4A; // Updated variable name to Question1
+    //const Question5 = req.query.Question5; // Updated variable name to Question1
+    //const Question5A = req.query.Question5A; // Updated variable name to Question1
+    //const Question6 = req.query.Question6; // Updated variable name to Question1
+    //const Question6A = req.query.Question6A; // Updated variable name to Question1
+    //const VideoOutro = req.query.VideoOutro; // Updated variable name to Question1
 
     if (!videoUrl) {
         return res.status(400).send('No URL provided.');
