@@ -341,12 +341,12 @@ async function processSixQuestionQuiz(req, res) {
 
         //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
         const clipStartTime = videoStartTime;
-        const clipDuration = 60; // Clip length (60 seconds)
+        const clipDuration = 80; // Clip length (60 seconds)
 
         //const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
         const videoStream = ytdl(videoUrl, {
             fmt: "mp4",
-            filter: format => format.codecs.includes('avc1') && !format.audioBitrate,
+            filter: 'videoonly',
             begin: `${clipStartTime}s`
         });
         //const videoStream = ytdl(videoUrl, {
