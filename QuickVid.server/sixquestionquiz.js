@@ -323,7 +323,7 @@ async function processSixQuestionQuiz(req, res) {
         //const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
         const format = ytdl.chooseFormat(info.formats, {
             quality: 'highestvideo',
-            filter: (format) => format.container === 'mp4'
+            container: 'mp4'
         });
         if (!format) {
             return res.status(400).send('No suitable format found.');
