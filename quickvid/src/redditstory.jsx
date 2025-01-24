@@ -71,7 +71,7 @@ const redditStory = () => {
 
     return (
         <div className="quiz-container">
-            <h1 className="QuestionQuizTitle">6 Question Quiz</h1>
+            <h1 className="QuestionQuizTitle">Reddit Story</h1>
             <h2 className="QATitles">Set the video background</h2>
             <input
                 type="text"
@@ -102,138 +102,6 @@ const redditStory = () => {
                 placeholder="Enter Video Hook"
                 className="text-input" />
             <br />
-            <div className="question-containers">
-                <div className="questionQContainers">
-                    <h2 className="QATitles">Question 1</h2>
-                    <input
-                        type="text"
-                        value={Question1}
-                        onChange={(e) => setQuestion1(e.target.value)}
-                        placeholder="Enter the first question"
-                        className="text-input" />
-                    <br />
-                </div>
-                <div className="questionAContainers">
-                    <h2 className="QATitles">Answer</h2>
-                    <input
-                        type="text"
-                        value={Question1A}
-                        onChange={(e) => setQuestion1A(e.target.value)}
-                        placeholder="Enter the answer"
-                        className="text-input" />
-                    <br />
-                </div>
-            </div>
-            <div className="question-containers">
-                <div className="questionQContainers">
-                    <h2 className="QATitles">Question 2</h2>
-                    <input
-                        type="text"
-                        value={Question2}
-                        onChange={(e) => setQuestion2(e.target.value)}
-                        placeholder="Enter the second question"
-                        className="text-input" />
-                    <br />
-                </div>
-                <div className="questionAContainers">
-                    <h2 className="QATitles">Answer</h2>
-                    <input
-                        type="text"
-                        value={Question2A}
-                        onChange={(e) => setQuestion2A(e.target.value)}
-                        placeholder="Enter the answer"
-                        className="text-input" />
-                    <br />
-                </div>
-            </div>
-            <div className="question-containers">
-                <div className="questionQContainers">
-                    <h2 className="QATitles">Question 3</h2>
-                    <input
-                        type="text"
-                        value={Question3}
-                        onChange={(e) => setQuestion3(e.target.value)}
-                        placeholder="Enter the third question"
-                        className="text-input" />
-                    <br />
-                </div>
-                <div className="questionAContainers">
-                    <h2 className="QATitles">Answer</h2>
-                    <input
-                        type="text"
-                        value={Question3A}
-                        onChange={(e) => setQuestion3A(e.target.value)}
-                        placeholder="Enter the answer"
-                        className="text-input" />
-                    <br />
-                </div>
-            </div>
-            <div className="question-containers">
-                <div className="questionQContainers">
-                    <h2 className="QATitles">Question 4</h2>
-                    <input
-                        type="text"
-                        value={Question4}
-                        onChange={(e) => setQuestion4(e.target.value)}
-                        placeholder="Enter the fourth question"
-                        className="text-input" />
-                    <br />
-                </div>
-                <div className="questionAContainers">
-                    <h2 className="QATitles">Answer</h2>
-                    <input
-                        type="text"
-                        value={Question4A}
-                        onChange={(e) => setQuestion4A(e.target.value)}
-                        placeholder="Enter the answer"
-                        className="text-input" />
-                    <br />
-                </div>
-            </div>
-            <div className="question-containers">
-                <div className="questionQContainers">
-                    <h2 className="QATitles">Question 5</h2>
-                    <input
-                        type="text"
-                        value={Question5}
-                        onChange={(e) => setQuestion5(e.target.value)}
-                        placeholder="Enter the fifth question"
-                        className="text-input" />
-                    <br />
-                </div>
-                <div className="questionAContainers">
-                    <h2 className="QATitles">Answer</h2>
-                    <input
-                        type="text"
-                        value={Question5A}
-                        onChange={(e) => setQuestion5A(e.target.value)}
-                        placeholder="Enter the answer"
-                        className="text-input" />
-                    <br />
-                </div>
-            </div>
-            <div className="question-containers">
-                <div className="questionQContainers">
-                    <h2 className="QATitles">Question 6</h2>
-                    <input
-                        type="text"
-                        value={Question6}
-                        onChange={(e) => setQuestion6(e.target.value)}
-                        placeholder="Enter the sixth question"
-                        className="text-input" />
-                    <br />
-                </div>
-                <div className="questionAContainers">
-                    <h2 className="QATitles">Answer</h2>
-                    <input
-                        type="text"
-                        value={Question6A}
-                        onChange={(e) => setQuestion6A(e.target.value)}
-                        placeholder="Enter the answer"
-                        className="text-input" />
-                    <br />
-                </div>
-            </div>
             <h2 className="QATitles">Set the video outro</h2>
             <input
                 type="text"
