@@ -20,7 +20,7 @@ app.post('/download', async (req, res) => {
                 await processSixQuestionQuiz(req, res);
                 break;
             case 'redditStory':
-                await processUserTextVideo(req, res);
+                await processRedditStory(req, res);
                 break;
             default:
                 res.status(400).send('Invalid video type');
