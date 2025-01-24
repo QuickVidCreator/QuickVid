@@ -26,9 +26,12 @@ const timerPath = path.join(__dirname, 'public', 'timer.mp3');
 const cert = fs.readFileSync(path.join(__dirname, 'certificate.pem'));
 const key = fs.readFileSync(path.join(__dirname, 'key.pem'));
 const ttsClient = new textToSpeech.TextToSpeechClient();
-
-async function processSixQuestionQuiz(req, res) {
+async function processRedditStory(req, res) {
     try {
-
+        console.log("REDDIT STORY SUCCESS");
+        res.send("reddit success");
     }
 }
+module.exports = {
+    processRedditStory
+};

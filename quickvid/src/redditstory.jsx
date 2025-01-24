@@ -6,18 +6,7 @@ const redditStory = () => {
     const [videoStartTime, setVideoStartTime] = useState('');
     const [VideoTitle, setVideoTitle] = useState('');
     const [VideoHook, setVideoHook] = useState('');
-    const [Question1, setQuestion1] = useState(''); // Updated variable name for user input
-    const [Question1A, setQuestion1A] = useState(''); // Updated variable name for user input
-    const [Question2, setQuestion2] = useState(''); // Updated variable name for user input
-    const [Question2A, setQuestion2A] = useState(''); // Updated variable name for user input
-    const [Question3, setQuestion3] = useState(''); // Updated variable name for user input
-    const [Question3A, setQuestion3A] = useState(''); // Updated variable name for user input
-    const [Question4, setQuestion4] = useState(''); // Updated variable name for user input
-    const [Question4A, setQuestion4A] = useState(''); // Updated variable name for user input
-    const [Question5, setQuestion5] = useState(''); // Updated variable name for user input
-    const [Question5A, setQuestion5A] = useState(''); // Updated variable name for user input
-    const [Question6, setQuestion6] = useState(''); // Updated variable name for user input
-    const [Question6A, setQuestion6A] = useState(''); // Updated variable name for user input
+    const [VideoText, setVideoText] = useState(''); // Updated variable name for user input
     const [VideoOutro, setVideoOutro] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
 
@@ -34,10 +23,6 @@ const redditStory = () => {
             alert('Please enter a valid video title');
             return;
         }
-        if (!Question1 || !Question1A || !Question2 || !Question2A || !Question3 || !Question3A || !Question4 || !Question4A || !Question5 || !Question5A || !Question6 || !Question6A) {
-            alert('One or more of your questions or answers are not valid');
-            return;
-        }
         if (!VideoOutro) {
             alert('Please enter a valid video outro');
             return;
@@ -45,31 +30,34 @@ const redditStory = () => {
         setIsDownloading(true);
 
         try {
-            const url = `https://75.135.157.2:3000/download?url=${encodeURIComponent(videoUrl)}&VideoStartTime=${encodeURIComponent(videoStartTime)}&VideoTitle=${encodeURIComponent(VideoTitle)}&VideoHook=${encodeURIComponent(VideoHook)}&Question1=${encodeURIComponent(Question1)}&Question1A=${encodeURIComponent(Question1A)}&Question2=${encodeURIComponent(Question2)}&Question2A=${encodeURIComponent(Question2A)}&Question3=${encodeURIComponent(Question3)}&Question3A=${encodeURIComponent(Question3A)}&Question4=${encodeURIComponent(Question4)}&Question4A=${encodeURIComponent(Question4A)}&Question5=${encodeURIComponent(Question5)}&Question5A=${encodeURIComponent(Question5A)}&Question6=${encodeURIComponent(Question6)}&Question6A=${encodeURIComponent(Question6A)}&VideoOutro=${encodeURIComponent(VideoOutro)}`;
-
-            fetch(url, {
-                method: 'GET',
+            const response = await fetch('https://75.135.157.2:3000/download', {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.blob(); // Get the binary file as a Blob
-                    } else {
-                        throw new Error('Network response was not ok');
-                    }
+                body: JSON.stringify({
+                    videoType: 'redditStory',
+                    videoUrl,
+                    videoStartTime,
+                    VideoTitle,
+                    VideoHook,
+                    VideoText,
+                    VideoOutro
                 })
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'video.mp4'; // Set the file name you want for the download
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove(); // Clean up the anchor element
-                })
-                .catch(error => console.error('Error:', error));
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'video.mp4';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
         } catch (error) {
             console.error('Error during download:', error);
             alert('An error occurred while downloading the video.');
@@ -263,4 +251,4 @@ const redditStory = () => {
     );
 };
 
-export default NormalQuiz;
+export default redditStory;

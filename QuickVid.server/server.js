@@ -1,4 +1,5 @@
 const { processSixQuestionQuiz } = require('./sixquestionquiz.js');
+const { processRedditStory } = require('./redditstory.js');
 const express = require('express');
 const https = require('https');  // Import the https module
 const cors = require('cors');
