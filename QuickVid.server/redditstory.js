@@ -2,7 +2,6 @@ const express = require('express');
 const https = require('https');  // Import the https module
 const ytdl = require('@distube/ytdl-core');
 const { createProxyAgent } = require('@distube/ytdl-core');  // Import createProxyAgent from distube's ytdl-core
-const textToSpeech = require('@google-cloud/text-to-speech');
 const gTTS = require('gtts');
 const ffmpegPath = require('ffmpeg-static');
 const { spawn } = require('child_process');
@@ -11,7 +10,7 @@ const path = require('path');
 const getMP3Duration = require('get-mp3-duration'); // Added this import
 const { PassThrough } = require('stream'); // Use require for consistency
 const textToSpeech = require('@google-cloud/text-to-speech');
-const fs = require('fs').promises;
+//const fs = require('fs').promises;
 
 
 const mime = require('mime-types');
@@ -30,7 +29,7 @@ const cert = fs.readFileSync(path.join(__dirname, 'certificate.pem'));
 const key = fs.readFileSync(path.join(__dirname, 'key.pem'));
 const ttsClient = new textToSpeech.TextToSpeechClient();
 
-async function textToSpeech(text) {
+async function generateSpeech(text) {
     const client = new textToSpeech.TextToSpeechClient();
 
     const request = {
@@ -66,7 +65,7 @@ async function textToSpeech(text) {
 async function processRedditStory(req, res) {
     try {
         console.log("REDDIT STORY SUCCESS");
-        textToSpeech('Hello world, how are you today?')
+        generateSpeech('Hello world, how are you today?')
             .then(result => console.log(result.wordTimings));
         res.send("reddit success");
     }

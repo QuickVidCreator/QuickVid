@@ -45,7 +45,7 @@ const App = () => {
                         }
                     />
                     <Route path="/sixquestionquiz" element={<NormalQuiz />} />
-                    <Route path="/redditstory" element={<RedditStory />} />
+                    <Route path="/redditstory" element={<redditstory />} />
                 </Routes>
             </div>
         </Router>
