@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import NormalQuiz from './NormalQuiz';
-import RedditStory from './RedditStory'; // Make sure you import the RedditStory component
+import RedditStory from './redditstory'; // Make sure you import the RedditStory component
 
 const App = () => {
     return (
@@ -45,7 +45,7 @@ const App = () => {
                         }
                     />
                     <Route path="/sixquestionquiz" element={<NormalQuiz />} />
-                    <Route path="/redditstory" element={<redditstory />} />
+                    <Route path="/redditstory" element={<RedditStory />} />
                 </Routes>
             </div>
         </Router>
