@@ -10,7 +10,7 @@ const path = require('path');
 const getMP3Duration = require('get-mp3-duration'); // Added this import
 const { PassThrough } = require('stream'); // Use require for consistency
 const textToSpeech = require('@google-cloud/text-to-speech');
-//const fs = require('fs').promises;
+const fsp = require('fs').promises;
 
 
 const mime = require('mime-types');
@@ -37,31 +37,37 @@ async function generateSpeech(text) {
         }
     });
 
+    // Add a mark at the end of each word
+    const ssmlText = text.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+
     const request = {
-        input: { text },
+        input: {
+            ssml: `<speak>${ssmlText}</speak>`
+        },
         voice: { languageCode: 'en-US' },
         audioConfig: {
             audioEncoding: 'MP3',
-            enableWordTimeOffsets: true
+            enableTimePointing: ['SSML_MARK']
         },
     };
 
     try {
         const [response] = await client.synthesizeSpeech(request);
 
-        // Save audio file
-        await fs.writeFile('output.mp3', response.audioContent);
+        await fsp.writeFile('output.mp3', response.audioContent);
 
-        // Extract word timings
-        const wordTimings = response.timepoints.map(point => ({
-            word: point.word,
-            startTime: point.startTimeSeconds,
-            endTime: point.endTimeSeconds
-        }));
+        // Print timepoints with words
+        response.timepoints.forEach(point => {
+            const wordIndex = point.markName.split('_')[1];
+            const word = text.split(' ')[wordIndex];
+            console.log(`Word: ${word}, Time: ${point.timeSeconds} seconds`);
+        });
 
         return {
             audioPath: 'output.mp3',
-            wordTimings
+            timepoints: response.timepoints
         };
     } catch (error) {
         console.error('TTS Error:', error);
