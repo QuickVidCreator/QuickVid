@@ -27,7 +27,6 @@ const fontPath = path.join(__dirname, 'public', 'MyFont.ttf').replace(/\\/g, '/'
 const timerPath = path.join(__dirname, 'public', 'timer.mp3');
 const cert = fs.readFileSync(path.join(__dirname, 'certificate.pem'));
 const key = fs.readFileSync(path.join(__dirname, 'key.pem'));
-const ttsClient = new textToSpeech.TextToSpeechClient();
 
 async function generateSpeech(text) {
     const client = new textToSpeech.TextToSpeechClient({
@@ -41,16 +40,18 @@ async function generateSpeech(text) {
     const ssmlText = text.split(' ')
         .map((word, index) => `${word} <mark name="word_${index}"/>`)
         .join(' ');
+    console.log(ssmlText);
 
     const request = {
         input: {
-            ssml: `<speak>${ssmlText}</speak>`
+            ssml: `<speak>Hello <mark name="timepoint_1"/> Mark. Good to <mark
+name="timepoint_2"/> see you.</speak>`
         },
         voice: { languageCode: 'en-US' },
         audioConfig: {
             audioEncoding: 'MP3',
-            enableTimePointing: ['SSML_MARK']
         },
+        enableTimePointing: ['SSML_MARK']
     };
 
     try {
