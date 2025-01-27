@@ -40,17 +40,17 @@ async function generateSpeech(text) {
     const ssmlText = text.split(' ')
         .map((word, index) => `${word} <mark name="word_${index}"/>`)
         .join(' ');
-    console.log(ssmlText);
+    const finalText = "<speak>" + ssmlText + "</speak>";
 
     const request = {
         input: {
-            ssml: ssmlText
+            ssml: finalText
         },
         voice: { languageCode: 'en-US' },
         audioConfig: {
             audioEncoding: 'MP3',
         },
-        enableTimePointing: ['SSML_MARK']
+        enableTimePointing: ["SSML_MARK"]
     };
 
     try {
@@ -75,14 +75,55 @@ async function generateSpeech(text) {
     }
 }
 async function processRedditStory(req, res) {
+    const {
+        videoUrl,
+        videoStartTime,
+        VideoTitle,
+        VideoHook,
+        VideoText,
+        VideoOutro
+    } = req.body;
     try {
         console.log("REDDIT STORY SUCCESS");
         generateSpeech('Hello world, how are you today?')
             .then(result => console.log(result.wordTimings));
-        res.send("reddit success");
     }
     catch {
         res.send("FAILURE");
+    }
+    try {
+        const info = await ytdl.getInfo(videoUrl);
+        const format = ytdl.chooseFormat(info.formats, {
+            quality: 'highestvideo',
+            container: 'mp4'
+        });
+        if (!format) {
+            return res.status(400).send('No suitable format found.');
+        }
+
+        // Set headers for video download
+        res.header('Content-Disposition', 'attachment; filename="video.mp4"');
+        res.header('Content-Type', mime.lookup('mp4') || 'application/octet-stream');
+        res.header('Cache-Control', 'no-cache');
+        res.header('Connection', 'keep-alive'); // Prevents premature disconnect
+        const clipStartTime = videoStartTime;
+        const clipDuration = 60; // Clip length (60 seconds)
+
+        const videoStream = ytdl(videoUrl, {
+            format: format,
+            begin: `${clipStartTime}s`,
+        });
+        // Stop stream after 60 seconds
+        setTimeout(() => {
+            videoStream.destroy();
+            console.log("Snippet download stopped.");
+        }, clipDuration * 1000);
+        await new Promise((resolve) => {
+            videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
+        });
+        catch {
+            console.log("ERROR DOWNLOADING VIDEO");
+        }
     }
 }
 module.exports = {
