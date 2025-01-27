@@ -66,7 +66,11 @@ async function generateSpeech(text) {
         });
         const timePoints = response.timepoints.map(point => point.timeSeconds);
         console.log(timePoints);
-        return Buffer.from(response.audioContent, 'base64');
+        const audioStream = new Readable();
+        audioStream.push(response.audioContent);
+        audioStream.push(null);  // Signals the end of the stream
+        return audioStream;
+
     } catch (error) {
         console.error('TTS Error:', error);
     }
@@ -80,140 +84,126 @@ async function processRedditStory(req, res) {
         VideoText,
         VideoOutro
     } = req.body;
-    try {
-        console.log("REDDIT STORY SUCCESS");
+    console.log("REDDIT STORY SUCCESS");
         //generateSpeech('Hello world, how are you today?')
         //.then(result => console.log(result.wordTimings));
-        const RedditAudio = generateSpeech(VideoText);
+    const RedditAudio = generateSpeech(VideoText);
+//DOWNLOAD VIDEO
+    const info = await ytdl.getInfo(videoUrl);
+    const format = ytdl.chooseFormat(info.formats, {
+        quality: 'highestvideo',
+        container: 'mp4'
+    });
+    if (!format) {
+        return res.status(400).send('No suitable format found.');
     }
-    catch {
-        res.send("FAILURE");
-    }
-    //DOWNLOAD VIDEO
-    try {
-        const info = await ytdl.getInfo(videoUrl);
-        const format = ytdl.chooseFormat(info.formats, {
-            quality: 'highestvideo',
-            container: 'mp4'
-        });
-        if (!format) {
-            return res.status(400).send('No suitable format found.');
+
+    // Set headers for video download
+    res.header('Content-Disposition', 'attachment; filename="video.mp4"');
+    res.header('Content-Type', mime.lookup('mp4') || 'application/octet-stream');
+    res.header('Cache-Control', 'no-cache');
+    res.header('Connection', 'keep-alive'); // Prevents premature disconnect
+    const clipStartTime = videoStartTime;
+    const clipDuration = 60; // Clip length (60 seconds)
+
+    const videoStream = ytdl(videoUrl, {
+        format: format,
+        begin: `${clipStartTime}s`,
+    });
+    // Stop stream after 60 seconds
+    setTimeout(() => {
+        videoStream.destroy();
+        console.log("Snippet download stopped.");
+    }, clipDuration * 1000);
+    await new Promise((resolve) => {
+        videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
+    });
+    const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
+    const RedditText = generateText(VideoText);
+    const ffmpeg = spawn(ffmpegPath, [
+        '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
+        '-i', 'pipe:3',              // Video stream input
+        '-thread_queue_size', '1024', // Increase thread queue for audio input
+        '-i', 'pipe:4',              // Audio input
+        '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // Text overlay
+        '-c:v', 'libx264',           // Video codec (H.264)
+        '-c:a', 'aac',               // Audio codec (AAC)
+        '-preset', 'ultrafast',       // Use ultrafast encoding preset
+        '-strict', 'experimental',   // Allow AAC codec usage
+        '-t', '60',                  // Set video duration to 60 seconds
+        '-f', 'mp4',                 // Output format
+        '-max_muxing_queue_size', '4096', // Increase muxing queue size
+        outputFilePath               // Write to the temporary file
+    ], {
+        stdio: [
+            'pipe', 'pipe', 'pipe',   // stdin, stdout, stderr
+            'pipe',                   // video input
+            'pipe'                    // audio input
+        ]
+    });
+
+    // Pipe video and audio streams into FFmpeg
+    videoStream.pipe(ffmpeg.stdio[3]).on('error', (err) => {
+        if (err.code === 'EPIPE') {
+            console.warn('Video stream ended unexpectedly (EPIPE)');
+        } else {
+            console.error('Error in video stream:', err);
         }
+    });
 
-        // Set headers for video download
-        res.header('Content-Disposition', 'attachment; filename="video.mp4"');
-        res.header('Content-Type', mime.lookup('mp4') || 'application/octet-stream');
-        res.header('Cache-Control', 'no-cache');
-        res.header('Connection', 'keep-alive'); // Prevents premature disconnect
-        const clipStartTime = videoStartTime;
-        const clipDuration = 60; // Clip length (60 seconds)
+    RedditAudio.pipe(ffmpeg.stdio[4]).on('error', (err) => {
+        if (err.code === 'EPIPE') {
+            console.warn('Audio stream ended unexpectedly (EPIPE)');
+        } else {
+            console.error('Error in audio stream:', err);
+        }
+    });
 
-        const videoStream = ytdl(videoUrl, {
-            format: format,
-            begin: `${clipStartTime}s`,
-        });
-        // Stop stream after 60 seconds
-        setTimeout(() => {
-            videoStream.destroy();
-            console.log("Snippet download stopped.");
-        }, clipDuration * 1000);
-        await new Promise((resolve) => {
-            videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
-        });
-    }
-    catch {
-            console.log("ERROR DOWNLOADING VIDEO");
-    }
-    try {
-        const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
-        const RedditText = generateText(VideoText);
-        const ffmpeg = spawn(ffmpegPath, [
-            '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
-            '-i', 'pipe:3',              // Video stream input
-            '-thread_queue_size', '1024', // Increase thread queue for audio input
-            '-i', 'pipe:4',              // Audio input
-            '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // Text overlay
-            '-c:v', 'libx264',           // Video codec (H.264)
-            '-c:a', 'aac',               // Audio codec (AAC)
-            '-preset', 'ultrafast',       // Use ultrafast encoding preset
-            '-strict', 'experimental',   // Allow AAC codec usage
-            '-t', '60',                  // Set video duration to 60 seconds
-            '-f', 'mp4',                 // Output format
-            '-max_muxing_queue_size', '4096', // Increase muxing queue size
-            outputFilePath               // Write to the temporary file
-        ], {
-            stdio: [
-                'pipe', 'pipe', 'pipe',   // stdin, stdout, stderr
-                'pipe',                   // video input
-                'pipe'                    // audio input
-            ]
-        });
+    // Ensure that FFmpeg knows the end of input streams is coming by explicitly ending the pipes
+    videoStream.on('end', () => {
+        ffmpeg.stdio[3].end(); // Close video input pipe
+    });
 
-        // Pipe video and audio streams into FFmpeg
-        videoStream.pipe(ffmpeg.stdio[3]).on('error', (err) => {
-            if (err.code === 'EPIPE') {
-                console.warn('Video stream ended unexpectedly (EPIPE)');
-            } else {
-                console.error('Error in video stream:', err);
+    finalStream.on('end', () => {
+        ffmpeg.stdio[4].end(); // Close audio input pipe
+    });
+
+    // Handle stderr to log any errors
+    ffmpeg.stderr.on('data', (data) => {
+        console.error(`FFmpeg stderr: ${data}`);
+    });
+
+    // Handle errors during the FFmpeg process
+    ffmpeg.on('error', (err) => {
+        console.error('FFmpeg error:', err);
+    });
+
+    // When FFmpeg finishes, handle sending the result to the client
+    ffmpeg.on('close', (code) => {
+        console.log(`FFmpeg process closed with code ${code}`);
+
+        // Attempt to send the video file to the client, even if FFmpeg failed
+        fs.stat(outputFilePath, (err, stats) => {
+            if (err || !stats.isFile()) {
+                console.error('Output file not found or inaccessible:', err);
+                return res.status(500).send('Failed to generate video.');
             }
-        });
 
-        RedditAudio.pipe(ffmpeg.stdio[4]).on('error', (err) => {
-            if (err.code === 'EPIPE') {
-                console.warn('Audio stream ended unexpectedly (EPIPE)');
-            } else {
-                console.error('Error in audio stream:', err);
-            }
-        });
-
-        // Ensure that FFmpeg knows the end of input streams is coming by explicitly ending the pipes
-        videoStream.on('end', () => {
-            ffmpeg.stdio[3].end(); // Close video input pipe
-        });
-
-        finalStream.on('end', () => {
-            ffmpeg.stdio[4].end(); // Close audio input pipe
-        });
-
-        // Handle stderr to log any errors
-        ffmpeg.stderr.on('data', (data) => {
-            console.error(`FFmpeg stderr: ${data}`);
-        });
-
-        // Handle errors during the FFmpeg process
-        ffmpeg.on('error', (err) => {
-            console.error('FFmpeg error:', err);
-        });
-
-        // When FFmpeg finishes, handle sending the result to the client
-        ffmpeg.on('close', (code) => {
-            console.log(`FFmpeg process closed with code ${code}`);
-
-            // Attempt to send the video file to the client, even if FFmpeg failed
-            fs.stat(outputFilePath, (err, stats) => {
-                if (err || !stats.isFile()) {
-                    console.error('Output file not found or inaccessible:', err);
-                    return res.status(500).send('Failed to generate video.');
+            // Send the file if it exists
+            res.sendFile(outputFilePath, (err) => {
+                //res.download(outputFilePath, 'video.mp4', (err) => {
+                if (err) {
+                    console.error('Error sending file:', err);
                 }
 
-                // Send the file if it exists
-                res.sendFile(outputFilePath, (err) => {
-                    //res.download(outputFilePath, 'video.mp4', (err) => {
-                    if (err) {
-                        console.error('Error sending file:', err);
-                    }
-
-                    // Cleanup temporary files after sending response
-                    fs.unlink(outputFilePath, (err) => {
-                        if (err) console.error('Error removing temporary output file:', err);
-                    });
+                // Cleanup temporary files after sending response
+                fs.unlink(outputFilePath, (err) => {
+                    if (err) console.error('Error removing temporary output file:', err);
                 });
             });
         });
-    }
-    catch {
-        console.log("FAILED TO CREATE VIDEO");
-    }
+    });
+}
 }
 const generateText = async (text) => {
     let drawTextCommands = '';
