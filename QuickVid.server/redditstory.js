@@ -27,7 +27,7 @@ const fontPath = path.join(__dirname, 'public', 'MyFont.ttf').replace(/\\/g, '/'
 const timerPath = path.join(__dirname, 'public', 'timer.mp3');
 const cert = fs.readFileSync(path.join(__dirname, 'certificate.pem'));
 const key = fs.readFileSync(path.join(__dirname, 'key.pem'));
-
+const timePoints = [];
 async function generateSpeech(text) {
     const client = new textToSpeech.v1beta1.TextToSpeechClient({
         credentials: {
@@ -91,6 +91,7 @@ async function processRedditStory(req, res) {
     catch {
         res.send("FAILURE");
     }
+    //DOWNLOAD VIDEO
     try {
         const info = await ytdl.getInfo(videoUrl);
         const format = ytdl.chooseFormat(info.formats, {
@@ -121,11 +122,141 @@ async function processRedditStory(req, res) {
         await new Promise((resolve) => {
             videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
         });
-        catch {
+    }
+    catch {
             console.log("ERROR DOWNLOADING VIDEO");
-        }
+    }
+    try {
+        const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
+        const RedditText = generateText(VideoText);
+        const ffmpeg = spawn(ffmpegPath, [
+            '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
+            '-i', 'pipe:3',              // Video stream input
+            '-thread_queue_size', '1024', // Increase thread queue for audio input
+            '-i', 'pipe:4',              // Audio input
+            '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // Text overlay
+            '-c:v', 'libx264',           // Video codec (H.264)
+            '-c:a', 'aac',               // Audio codec (AAC)
+            '-preset', 'ultrafast',       // Use ultrafast encoding preset
+            '-strict', 'experimental',   // Allow AAC codec usage
+            '-t', '60',                  // Set video duration to 60 seconds
+            '-f', 'mp4',                 // Output format
+            '-max_muxing_queue_size', '4096', // Increase muxing queue size
+            outputFilePath               // Write to the temporary file
+        ], {
+            stdio: [
+                'pipe', 'pipe', 'pipe',   // stdin, stdout, stderr
+                'pipe',                   // video input
+                'pipe'                    // audio input
+            ]
+        });
+
+        // Pipe video and audio streams into FFmpeg
+        videoStream.pipe(ffmpeg.stdio[3]).on('error', (err) => {
+            if (err.code === 'EPIPE') {
+                console.warn('Video stream ended unexpectedly (EPIPE)');
+            } else {
+                console.error('Error in video stream:', err);
+            }
+        });
+
+        finalStream.pipe(ffmpeg.stdio[4]).on('error', (err) => {
+            if (err.code === 'EPIPE') {
+                console.warn('Audio stream ended unexpectedly (EPIPE)');
+            } else {
+                console.error('Error in audio stream:', err);
+            }
+        });
+
+        // Ensure that FFmpeg knows the end of input streams is coming by explicitly ending the pipes
+        videoStream.on('end', () => {
+            ffmpeg.stdio[3].end(); // Close video input pipe
+        });
+
+        finalStream.on('end', () => {
+            ffmpeg.stdio[4].end(); // Close audio input pipe
+        });
+
+        // Handle stderr to log any errors
+        ffmpeg.stderr.on('data', (data) => {
+            console.error(`FFmpeg stderr: ${data}`);
+        });
+
+        // Handle errors during the FFmpeg process
+        ffmpeg.on('error', (err) => {
+            console.error('FFmpeg error:', err);
+        });
+
+        // When FFmpeg finishes, handle sending the result to the client
+        ffmpeg.on('close', (code) => {
+            console.log(`FFmpeg process closed with code ${code}`);
+
+            // Attempt to send the video file to the client, even if FFmpeg failed
+            fs.stat(outputFilePath, (err, stats) => {
+                if (err || !stats.isFile()) {
+                    console.error('Output file not found or inaccessible:', err);
+                    return res.status(500).send('Failed to generate video.');
+                }
+
+                // Send the file if it exists
+                res.sendFile(outputFilePath, (err) => {
+                    //res.download(outputFilePath, 'video.mp4', (err) => {
+                    if (err) {
+                        console.error('Error sending file:', err);
+                    }
+
+                    // Cleanup temporary files after sending response
+                    fs.unlink(outputFilePath, (err) => {
+                        if (err) console.error('Error removing temporary output file:', err);
+                    });
+                });
+            });
+        });
     }
 }
+const generateText = async (text, timePoints) => {
+    let drawTextCommands = '';
+    const words = text.split(' '); // Still need this to get the actual words
+
+    // Using timePoints.length directly to determine iterations
+    for (let i = 0; i < timePoints.length; i++) {
+        const word = words[i];
+        const startTime = i === 0 ? 0 : timePoints[i - 1];
+        const endTime = timePoints[i];
+
+        console.log(`Word: ${word} - Starting: ${startTime} Ending: ${endTime}`);
+
+        drawTextCommands += `drawtext=text='${word}':` +
+            `x=(w-text_w)/2:` +
+            `y=(h-text_h)/3:` +
+            `fontsize=100:` +
+            `fontcolor=white:` +
+            `fontfile='${fontPath}':` +
+            `enable='between(t,${startTime},${endTime})',`;
+    }
+
+    return drawTextCommands.slice(0, -1);
+};
+//const generateText = async (text) => {
+//    const timeTracker = 1;
+//    const startTime = 0;
+//    const endTime = timePoints[timeTracker];
+//    //let currentTime = 0; // Cumulative time tracker
+//    let drawTextCommands = '';
+
+//    for (let i = 0; i < timePoints.length; i++) {
+//        //const startTime = currentTime / 1000; // Convert ms to seconds
+//        //const endTime = (currentTime + duration) / 1000;
+//        console.log("starting: " + startTime + " Ending: " + endTime);
+//        drawTextCommands += `drawtext=text='${word}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=100:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime},${endTime})',`;
+//        startTime = endTime;
+//        endTime = timePoints[timeTracker + 1];
+//        currentTime += duration; // Update cumulative time
+//    }
+
+//    // Remove the trailing comma
+//    return drawTextCommands.trim().slice(0, -1);
+//};
 module.exports = {
     processRedditStory
 };

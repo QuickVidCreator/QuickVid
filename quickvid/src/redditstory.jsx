@@ -102,6 +102,13 @@ const redditStory = () => {
                 placeholder="Enter Video Hook"
                 className="text-input" />
             <br />
+            <h2 className="QATitles">Set the reddit story text</h2>
+            <input
+                type="text"
+                value={VideoText}
+                onChange={(e) => setVideoText(e.target.value)}
+                placeholder="Enter Reddit Story Text"
+                className="text-input" />
             <h2 className="QATitles">Set the video outro</h2>
             <input
                 type="text"
