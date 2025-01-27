@@ -56,7 +56,7 @@ async function generateSpeech(text) {
     try {
         const [response] = await client.synthesizeSpeech(request);
 
-        await fsp.writeFile('output.mp3', response.audioContent);
+        //await fsp.writeFile('output.mp3', response.audioContent);
 
         // Print timepoints with words
         response.timepoints.forEach(point => {
@@ -66,10 +66,7 @@ async function generateSpeech(text) {
         });
         const timePoints = response.timepoints.map(point => point.timeSeconds);
         console.log(timePoints);
-        return {
-            audioPath: 'output.mp3',
-            timepoints: response.timepoints
-        };
+        return Buffer.from(response.audioContent, 'base64');
     } catch (error) {
         console.error('TTS Error:', error);
     }
@@ -85,8 +82,9 @@ async function processRedditStory(req, res) {
     } = req.body;
     try {
         console.log("REDDIT STORY SUCCESS");
-        generateSpeech('Hello world, how are you today?')
-            .then(result => console.log(result.wordTimings));
+        //generateSpeech('Hello world, how are you today?')
+        //.then(result => console.log(result.wordTimings));
+        const RedditAudio = generateSpeech(VideoText);
     }
     catch {
         res.send("FAILURE");
@@ -160,7 +158,7 @@ async function processRedditStory(req, res) {
             }
         });
 
-        finalStream.pipe(ffmpeg.stdio[4]).on('error', (err) => {
+        RedditAudio.pipe(ffmpeg.stdio[4]).on('error', (err) => {
             if (err.code === 'EPIPE') {
                 console.warn('Audio stream ended unexpectedly (EPIPE)');
             } else {
@@ -213,8 +211,11 @@ async function processRedditStory(req, res) {
             });
         });
     }
+    catch {
+        console.log("FAILED TO CREATE VIDEO");
+    }
 }
-const generateText = async (text, timePoints) => {
+const generateText = async (text) => {
     let drawTextCommands = '';
     const words = text.split(' '); // Still need this to get the actual words
 
