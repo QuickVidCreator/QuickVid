@@ -8,7 +8,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const getMP3Duration = require('get-mp3-duration'); // Added this import
-const { PassThrough } = require('stream'); // Use require for consistency
+const { Readable } = require('stream'); // Use require for consistency
 const textToSpeech = require('@google-cloud/text-to-speech');
 const fsp = require('fs').promises;
 
@@ -66,9 +66,11 @@ async function generateSpeech(text) {
         });
         const timePoints = response.timepoints.map(point => point.timeSeconds);
         console.log(timePoints);
-        const audioStream = new Readable();
-        audioStream.push(response.audioContent);
-        audioStream.push(null);  // Signals the end of the stream
+        const audioStream = new Readable({
+            read() { }
+        });
+        audioStream.push(Buffer.from(response.audioContent));
+        audioStream.push(null);
         return audioStream;
 
     } catch (error) {
@@ -87,7 +89,7 @@ async function processRedditStory(req, res) {
     console.log("REDDIT STORY SUCCESS");
         //generateSpeech('Hello world, how are you today?')
         //.then(result => console.log(result.wordTimings));
-    const RedditAudio = generateSpeech(VideoText);
+    const RedditAudio = await generateSpeech(VideoText);
 //DOWNLOAD VIDEO
     const info = await ytdl.getInfo(videoUrl);
     const format = ytdl.chooseFormat(info.formats, {
@@ -203,7 +205,6 @@ async function processRedditStory(req, res) {
             });
         });
     });
-}
 }
 const generateText = async (text) => {
     let drawTextCommands = '';
