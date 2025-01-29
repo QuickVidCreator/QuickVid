@@ -27,7 +27,6 @@ const fontPath = path.join(__dirname, 'public', 'MyFont.ttf').replace(/\\/g, '/'
 const timerPath = path.join(__dirname, 'public', 'timer.mp3');
 const cert = fs.readFileSync(path.join(__dirname, 'certificate.pem'));
 const key = fs.readFileSync(path.join(__dirname, 'key.pem'));
-const timePoints = [];
 async function generateSpeech(text) {
     const client = new textToSpeech.v1beta1.TextToSpeechClient({
         credentials: {
@@ -71,7 +70,7 @@ async function generateSpeech(text) {
         });
         audioStream.push(Buffer.from(response.audioContent));
         audioStream.push(null);
-        return audioStream;
+        return { audioStream, timePoints };
 
     } catch (error) {
         console.error('TTS Error:', error);
@@ -89,7 +88,7 @@ async function processRedditStory(req, res) {
     console.log("REDDIT STORY SUCCESS");
         //generateSpeech('Hello world, how are you today?')
         //.then(result => console.log(result.wordTimings));
-    const RedditAudio = await generateSpeech(VideoText);
+    const { audioStream: RedditAudio, timePoints } = await generateSpeech(VideoText);
 //DOWNLOAD VIDEO
     const info = await ytdl.getInfo(videoUrl);
     const format = ytdl.chooseFormat(info.formats, {
@@ -121,7 +120,7 @@ async function processRedditStory(req, res) {
         videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
     });
     const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
-    const RedditText = generateText(VideoText);
+    const RedditText = generateText(VideoText, timePoints);
     const ffmpeg = spawn(ffmpegPath, [
         '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
         '-i', 'pipe:3',              // Video stream input
@@ -166,7 +165,7 @@ async function processRedditStory(req, res) {
         ffmpeg.stdio[3].end(); // Close video input pipe
     });
 
-    finalStream.on('end', () => {
+    RedditAudio.on('end', () => {
         ffmpeg.stdio[4].end(); // Close audio input pipe
     });
 
@@ -206,7 +205,7 @@ async function processRedditStory(req, res) {
         });
     });
 }
-const generateText = async (text) => {
+const generateText = async (text, timePoints) => {
     let drawTextCommands = '';
     const words = text.split(' '); // Still need this to get the actual words
 
