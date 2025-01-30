@@ -107,11 +107,33 @@ async function processRedditStory(req, res) {
     const clipStartTime = videoStartTime;
     const clipDuration = 60; // Clip length (60 seconds)
 
-    ytdl(videoUrl, {quality: 'highestvideo', container: 'mp4'}).pipe(require"fs").createWriteStream("TempVideo.mp4");
-    const videoStream = ytdl(videoUrl, {
-        format: format,
-        begin: `${clipStartTime}s`,
+    await new Promise((resolve, reject) => {
+        const RedditVideoStream = fs.createWriteStream(tempFilePath);
+        const videoDownload = ytdl(videoUrl, {
+            format: format,
+            begin: `${videoStartTime}s`,
+        }).pipe(RedditVideoStream);
+
+        videoDownload.on("error", reject);
+        RedditVideoStream.on("error", reject);
+
+        RedditVideoStream.on("finish", () => {
+            console.log("? Video Download Completed.");
+            resolve();
+        });
+
+        // Safety timeout in case "finish" never fires
+        setTimeout(() => {
+            console.warn("?? Warning: Video download took too long, forcing resolve.");
+            RedditVideoStream.end(); // Ensure stream closes
+            resolve();
+        },  3 * 1000); // 60 seconds timeout
     });
+    //const videoStream = ytdl(videoUrl, {
+        //format: format,
+        //begin: `${clipStartTime}s`,
+        //highWaterMark: 100 * 1024 * 1024, // 10 MB buffer (increase as needed)
+    //});
     // Stop stream after 60 seconds
     setTimeout(() => {
         videoStream.destroy();
@@ -207,7 +229,7 @@ async function processRedditStory(req, res) {
         });
     });
 }
-const generateText = async (text, timePoints) => {
+const generateText = (text, timePoints) => {
     let drawTextCommands = '';
     const words = text.split(' '); // Still need this to get the actual words
 
