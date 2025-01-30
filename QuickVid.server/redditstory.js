@@ -107,6 +107,17 @@ async function processRedditStory(req, res) {
     const clipStartTime = videoStartTime;
     const clipDuration = 60; // Clip length (60 seconds)
 
+    //ytdl(videoUrl, { quality: 'highestvideo', container: 'mp4' }).pipe(require("fs").createWriteStream("TempVideo.mp4");
+    await new Promise((resolve, reject) => {
+        const tempStream = ytdl(videoUrl, {
+            format: format,
+            begin: `${videoStartTime}s`,
+        })
+            .pipe(fs.createWriteStream(tempFilePath));
+
+        tempStream.on("finish", resolve);
+        tempStream.on("error", reject);
+    });
     const videoStream = ytdl(videoUrl, {
         format: format,
         begin: `${clipStartTime}s`,
@@ -121,6 +132,7 @@ async function processRedditStory(req, res) {
     });
     const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
     const RedditText = generateText(VideoText, timePoints);
+    console.log(RedditText);
     const ffmpeg = spawn(ffmpegPath, [
         '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
         '-i', 'pipe:3',              // Video stream input
@@ -142,9 +154,9 @@ async function processRedditStory(req, res) {
             'pipe'                    // audio input
         ]
     });
-
+    const fileStream = fs.createReadStream(tempFilePath);
     // Pipe video and audio streams into FFmpeg
-    videoStream.pipe(ffmpeg.stdio[3]).on('error', (err) => {
+    fileStream.pipe(ffmpeg.stdio[3]).on('error', (err) => {
         if (err.code === 'EPIPE') {
             console.warn('Video stream ended unexpectedly (EPIPE)');
         } else {
