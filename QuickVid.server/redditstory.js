@@ -105,7 +105,7 @@ async function processRedditStory(req, res) {
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive'); // Prevents premature disconnect
     const clipStartTime = videoStartTime;
-    const clipDuration = 60; // Clip length (60 seconds)
+    const clipDuration = 10; // Clip length (60 seconds)
 
     const videoStream = ytdl(videoUrl, {
         format: format,

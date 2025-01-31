@@ -9,6 +9,8 @@ const redditStory = () => {
     const [VideoText, setVideoText] = useState(''); // Updated variable name for user input
     const [VideoOutro, setVideoOutro] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
+    const [showProgress, setShowProgress] = useState(false);
+    const [progressValue, setProgressValue] = useState(false);
 
     const handleDownload = async () => {
         if (!videoUrl) {
@@ -28,6 +30,7 @@ const redditStory = () => {
             return;
         }
         setIsDownloading(true);
+        progressBarFunction()
 
         try {
             const response = await fetch('https://75.135.157.2:3000/download', {
@@ -58,6 +61,11 @@ const redditStory = () => {
             document.body.appendChild(a);
             a.click();
             a.remove();
+            // Notify progress function that the file is received
+            setProgressValue(1);
+            setTimeout(() => {
+                setShowProgress(false);
+            }, 500);
         } catch (error) {
             console.error('Error during download:', error);
             alert('An error occurred while downloading the video.');
@@ -66,7 +74,28 @@ const redditStory = () => {
         }
     };
 
+    function progressBarFunction() {
+        let progress = 0.0;
+        setShowProgress(true);
 
+        const interval = setInterval(() => {
+            progress += (progress < 0.8 ? 0.02 : 0.005); // Fast until 0.8, then slow
+            setProgressValue(progress);
+
+            if (progress >= 1) {
+                clearInterval(interval);
+            }
+        }, 100); // Runs every 100ms
+
+        // Stop the progress when the file is received
+        setProgressValue(prev => {
+            if (prev >= 1) {
+                clearInterval(interval);
+                return 1;
+            }
+            return prev;
+        });
+    }
 
 
     return (
@@ -122,6 +151,12 @@ const redditStory = () => {
                 className={`download-button ${isDownloading ? 'disabled' : ''}`}>
                 {isDownloading ? 'Downloading...' : 'Download Video'}
             </button>
+            <div
+                id="progressOverlay"
+                className="progressOverlay"
+                style={{ display: showProgress ? 'block' : 'none' }}>
+                <progress id="progress-bar" value={progressValue}/>
+            </div>
         </div>
     );
 };

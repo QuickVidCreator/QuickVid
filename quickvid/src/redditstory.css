@@ -108,6 +108,14 @@ body {
         cursor: not-allowed;
     }
 
+.progressOverlay {
+    position: fixed;
+    display: none;
+    width: 70%;
+    height: 80%;
+    background-color: #a6a6a680;
+    border-radius: 30px;
+}
 /* Media Queries for Responsiveness */
 @media (max-width: 1200px) {
     .question1-container,
