@@ -79,7 +79,7 @@ const redditStory = () => {
         setShowProgress(true);
 
         const interval = setInterval(() => {
-            progress += (progress < 0.8 ? 0.01 : 0.0005); // Fast until 0.8, then slow
+            progress += (progress < 0.8 ? 0.008 : 0.002); // Fast until 0.8, then slow
             setProgressValue(progress);
 
             if (progress >= 1) {
