@@ -92,7 +92,7 @@ async function processRedditStory(req, res) {
 //DOWNLOAD VIDEO
     const info = await ytdl.getInfo(videoUrl);
     const format = ytdl.chooseFormat(info.formats, {
-        quality: 'highestvideo',
+        quality: 'highest',
         container: 'mp4'
     });
     if (!format) {
@@ -107,33 +107,10 @@ async function processRedditStory(req, res) {
     const clipStartTime = videoStartTime;
     const clipDuration = 60; // Clip length (60 seconds)
 
-    await new Promise((resolve, reject) => {
-        const RedditVideoStream = fs.createWriteStream(tempFilePath);
-        const videoDownload = ytdl(videoUrl, {
-            format: format,
-            begin: `${videoStartTime}s`,
-        }).pipe(RedditVideoStream);
-
-        videoDownload.on("error", reject);
-        RedditVideoStream.on("error", reject);
-
-        RedditVideoStream.on("finish", () => {
-            console.log("? Video Download Completed.");
-            resolve();
-        });
-
-        // Safety timeout in case "finish" never fires
-        setTimeout(() => {
-            console.warn("?? Warning: Video download took too long, forcing resolve.");
-            RedditVideoStream.end(); // Ensure stream closes
-            resolve();
-        },  3 * 1000); // 60 seconds timeout
+    const videoStream = ytdl(videoUrl, {
+        format: format,
+        begin: `${clipStartTime}s`,
     });
-    //const videoStream = ytdl(videoUrl, {
-        //format: format,
-        //begin: `${clipStartTime}s`,
-        //highWaterMark: 100 * 1024 * 1024, // 10 MB buffer (increase as needed)
-    //});
     // Stop stream after 60 seconds
     setTimeout(() => {
         videoStream.destroy();
@@ -155,6 +132,8 @@ async function processRedditStory(req, res) {
         '-c:a', 'aac',               // Audio codec (AAC)
         '-preset', 'ultrafast',       // Use ultrafast encoding preset
         '-strict', 'experimental',   // Allow AAC codec usage
+        '-map', '0:v',
+        '-map', '1:a',
         '-t', '60',                  // Set video duration to 60 seconds
         '-f', 'mp4',                 // Output format
         '-max_muxing_queue_size', '4096', // Increase muxing queue size

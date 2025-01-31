@@ -322,7 +322,7 @@ async function processSixQuestionQuiz(req, res) {
 
         //const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
         const format = ytdl.chooseFormat(info.formats, {
-            quality: 'highestvideo',
+            quality: 'highest',
             container: 'mp4'
         });
         if (!format) {
@@ -425,6 +425,8 @@ async function processSixQuestionQuiz(req, res) {
             '-c:a', 'aac',               // Audio codec (AAC)
             '-preset', 'ultrafast',       // Use ultrafast encoding preset
             '-strict', 'experimental',   // Allow AAC codec usage
+            '-map', '0:v',
+            '-map', '1:a',
             '-t', '60',                  // Set video duration to 60 seconds
             '-f', 'mp4',                 // Output format
             '-max_muxing_queue_size', '4096', // Increase muxing queue size
