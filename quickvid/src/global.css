@@ -1,0 +1,82 @@
+.progressOverlay {
+    position: fixed;
+    display: none;
+    width: 30%;
+    height: 60%;
+    background-color: rgba(166, 166, 166, 0.95); /* 95% opacity */
+    border-radius: 30px;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+}
+
+.progress-title {
+    color: rgba(0,212,255,1);
+    font-size: 30px;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black;
+}
+.progress-bar {
+    width: 50%;
+    height: 5%;
+    appearance: none; /* Remove default styling */
+    background: #e0e0e0; /* Background of the track */
+    border-radius: 25px;
+    border: 1px solid black; /* Black border */
+    overflow: hidden;
+    box-shadow: inset 0 0 5px 2px black, inset 0 0 3px black;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0px 0px 5px 2px rgba(0,212,255,1);
+}
+
+    /* WebKit Browsers (Chrome, Safari) */
+    .progress-bar::-webkit-progress-value {
+        background: linear-gradient(145deg, rgba(7,0,128,1) 0%, rgba(9,9,121,1) 28%, rgba(0,212,255,1) 95%);
+        border-radius: 25px;
+        margin: 0 -0.5px; /* Prevents edge touch */
+    }
+
+    /* Background track */
+    .progress-bar::-webkit-progress-bar {
+        background: #e0e0e0;
+        border-radius: 25px;
+    }
+
+    /* Firefox */
+    .progress-bar::-moz-progress-bar {
+        background: linear-gradient(145deg, rgba(7,0,128,1) 0%, rgba(9,9,121,1) 28%, rgba(0,212,255,1) 95%);
+        border-radius: 2px;
+    }
+    /* Mobile Adjustments */
+@media (max-width: 768px) {
+    .progressOverlay {
+        width: 90%; /* More space on smaller screens */
+        height: 50%; /* Reduce height slightly */
+    }
+
+    .progress-bar {
+        width: 90%; /* Allow the bar to take more space */
+    }
+
+    .progress-title {
+        font-size: 6vw; /* Responsive title font size */
+    }
+}
+
+/* Very Small Screens (Portrait phones, etc.) */
+@media (max-width: 480px) {
+    .progressOverlay {
+        width: 70%; /* Almost full width */
+        height: 60%; /* Smaller height */
+    }
+
+    .progress-bar {
+        width: 80%; /* More space for progress bar */
+    }
+
+    .progress-title {
+        font-size: 8vw; /* Larger title font size for small screens */
+    }
+}

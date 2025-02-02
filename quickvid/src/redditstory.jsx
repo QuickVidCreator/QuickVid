@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './redditstory.css'; // Import the CSS file
+import './global.css';
 
 const redditStory = () => {
     const [videoUrl, setVideoUrl] = useState('');
@@ -149,13 +150,14 @@ const redditStory = () => {
                 onClick={handleDownload}
                 disabled={isDownloading}
                 className={`download-button ${isDownloading ? 'disabled' : ''}`}>
-                {isDownloading ? 'Downloading...' : 'Download Video'}
+                {isDownloading ? 'Generating...' : 'Generate Video'}
             </button>
             <div
                 id="progressOverlay"
                 className="progressOverlay"
                 style={{ display: showProgress ? 'block' : 'none' }}>
-                <progress id="progress-bar" value={progressValue}/>
+                <h2 className="progress-title">VIDEO IS BEING GENERATED</h2>
+                <progress className="progress-bar" id="progress-bar" value={progressValue}/>
             </div>
         </div>
     );
