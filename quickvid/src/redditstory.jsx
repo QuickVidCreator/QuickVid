@@ -101,6 +101,7 @@ const redditStory = () => {
 
     return (
         <div className="quiz-container">
+            <button className="back-button">Back</button>
             <h1 className="QuestionQuizTitle">Reddit Story</h1>
             <h2 className="QATitles">Set the video background</h2>
             <input

@@ -87,29 +87,6 @@ body {
     margin: 5px 0;
     color: rgba(0,212,255,1);
 }
-/* Download Button */
-.download-button {
-    padding: 15px 30px; /* Larger button */
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-    font-size: 18px; /* Larger font for better visibility */
-}
-
-    .download-button:hover {
-        background-color: #218838;
-    }
-
-    .download-button.disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-    }
-
-
-
 /* Media Queries for Responsiveness */
 @media (max-width: 1200px) {
     .question1-container,

@@ -25,6 +25,7 @@
     width: 90%; /* Changed to percentage for better responsiveness */
     max-width: 300px;
     min-height: 150px;
+    height: 175px;
     display: flex;
     flex-direction: column;
     align-items: center;

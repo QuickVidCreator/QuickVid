@@ -12,7 +12,6 @@ const App = () => {
                         path="/"
                         element={
                             <div>
-                                <h1>QuickTok</h1>
                                 <div> {/* Removed Link wrapper, will use individual Links */}
                                     <Link to="/sixquestionquiz">
                                         <button className="OptionsBtns">
