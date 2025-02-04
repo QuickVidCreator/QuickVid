@@ -92,7 +92,7 @@ async function processRedditStory(req, res) {
 //DOWNLOAD VIDEO
     const info = await ytdl.getInfo(videoUrl);
     const format = ytdl.chooseFormat(info.formats, {
-        quality: 'highest',
+        quality: 'highestvideo',
         container: 'mp4'
     });
     if (!format) {
@@ -105,7 +105,7 @@ async function processRedditStory(req, res) {
     res.header('Cache-Control', 'no-cache');
     res.header('Connection', 'keep-alive'); // Prevents premature disconnect
     const clipStartTime = videoStartTime;
-    const clipDuration = 10; // Clip length (60 seconds)
+    const clipDuration = 40; // Clip length (60 seconds)
 
     const videoStream = ytdl(videoUrl, {
         format: format,
@@ -128,12 +128,12 @@ async function processRedditStory(req, res) {
         '-i', 'pipe:3',              // Video stream input
         '-thread_queue_size', '1024', // Increase thread queue for audio input
         '-i', 'pipe:4',              // Audio input
-        '-vf', `scale=1080:1920:flags=lanczos,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // High-quality scaling
-        //'-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // Text overlay
+        //'-vf', `scale=1080:1920:flags=lanczos,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // High-quality scaling
+        '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // Text overlay
         '-c:v', 'libx264',           // Video codec (H.264)
         '-c:a', 'aac',               // Audio codec (AAC)
-        '-preset', 'superfast',               // Better quality than ultrafast
-        '-crf', '18',                        // High quality (lower = better)
+        '-preset', 'ultrafast',               // Better quality than ultrafast
+        //'-crf', '18',                        // High quality (lower = better)
         '-strict', 'experimental',   // Allow AAC codec usage
         '-map', '0:v',
         '-map', '1:a',
