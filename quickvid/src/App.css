@@ -84,8 +84,16 @@
 
 /* Media query for mobile devices */
 @media screen and (max-width: 480px) {
+    .ButtonsClass {
+        display: grid;
+        align-items: center;
+        justify-content: center;
+        gap: 50px;
+        width: 100%;
+    }
     .OptionsBtns {
         min-height: 120px; /* Slightly reduced height for mobile */
+        min-width: 100%;
     }
 
     .OptionsBtnsVMContainer {
