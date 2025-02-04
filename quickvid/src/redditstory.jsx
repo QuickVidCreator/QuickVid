@@ -34,7 +34,8 @@ const redditStory = () => {
         progressBarFunction()
 
         try {
-            const response = await fetch('https://75.135.157.2:3000/download', {
+            //const response = await fetch('https://75.135.157.2:3000/download', {
+            const response = await fetch('https://api.quick-vid.com:3000/download', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
