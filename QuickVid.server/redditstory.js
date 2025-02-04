@@ -127,10 +127,12 @@ async function processRedditStory(req, res) {
         '-i', 'pipe:3',              // Video stream input
         '-thread_queue_size', '1024', // Increase thread queue for audio input
         '-i', 'pipe:4',              // Audio input
-        '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // Text overlay
+        '-vf', `scale=1080:1920:flags=lanczos,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // High-quality scaling
+        //'-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // Text overlay
         '-c:v', 'libx264',           // Video codec (H.264)
         '-c:a', 'aac',               // Audio codec (AAC)
-        '-preset', 'ultrafast',       // Use ultrafast encoding preset
+        '-preset', 'superfast',               // Better quality than ultrafast
+        '-crf', '18',                        // High quality (lower = better)
         '-strict', 'experimental',   // Allow AAC codec usage
         '-map', '0:v',
         '-map', '1:a',
