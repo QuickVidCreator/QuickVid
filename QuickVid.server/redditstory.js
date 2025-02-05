@@ -119,12 +119,16 @@ async function processRedditStory(req, res) {
     await new Promise((resolve) => {
         videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
     });
+
+    let fpsCheck = format.fps;
+    
     const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
     const RedditText = generateText(VideoText, timePoints);
     console.log(RedditText);
     const ffmpeg = spawn(ffmpegPath, [
         '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
-        '-r', '30',
+        '-r', '45',
+        '-thread_queue_size', '1024', // Increase thread queue for audio input
         '-i', 'pipe:3',              // Video stream input
         '-thread_queue_size', '1024', // Increase thread queue for audio input
         '-i', 'pipe:4',              // Audio input
@@ -133,10 +137,11 @@ async function processRedditStory(req, res) {
         '-c:v', 'libx264',           // Video codec (H.264)
         '-c:a', 'aac',               // Audio codec (AAC)
         '-preset', 'ultrafast',               // Better quality than ultrafast
+        '-tune', 'fastdecode',
         //'-crf', '18',                        // High quality (lower = better)
         '-strict', 'experimental',   // Allow AAC codec usage
-        '-map', '0:v',
-        '-map', '1:a',
+        //'-map', '0:v',
+        //'-map', '1:a',
         '-t', '60',                  // Set video duration to 60 seconds
         '-f', 'mp4',                 // Output format
         '-max_muxing_queue_size', '4096', // Increase muxing queue size
