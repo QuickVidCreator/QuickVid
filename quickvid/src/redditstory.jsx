@@ -1,30 +1,31 @@
 import { useState } from 'react';
 import './redditstory.css'; // Import the CSS file
 import './global.css';
-const getVideoLimit = async () => {
+const getVideoLimit = async (userId) => {
     try {
-        const response = await fetch('https://your-wordpress-site.com/wp-admin/admin-ajax.php?action=get_video_limit', {
+        const response = await fetch(`https://yourwebsite.com/wp-json/custom/v1/video-limit/${userId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include',  // Include cookies to maintain session (this assumes the user is logged in)
+            credentials: 'include', // Include cookies for logged-in users
         });
 
         const data = await response.json();
+        console.log(data); // Log the response
 
-        if (data.success) {
-            console.log('Video Limit:', data.data.video_limit);
+        if (data.video_limit !== undefined) {
+            console.log('Video Limit:', data.video_limit); // Display video limit
         } else {
-            console.error('Error:', data.data.message);
+            console.error('Error:', data.error);
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching video limit:', error);
     }
 };
 
 // Call the function to get the video limit
-getVideoLimit();
+//getVideoLimit();
 const redditStory = () => {
     const [videoUrl, setVideoUrl] = useState('');
     const [videoStartTime, setVideoStartTime] = useState('');
@@ -36,7 +37,7 @@ const redditStory = () => {
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
 
-    getVideoLimit();
+    getVideoLimit(4);
 
     const handleDownload = async () => {
         if (!videoUrl) {
