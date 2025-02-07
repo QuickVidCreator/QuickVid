@@ -1,33 +1,30 @@
 import { useState } from 'react';
 import './redditstory.css'; // Import the CSS file
 import './global.css';
-
-const getMembershipLevels = async () => {
-    const auth = btoa("imconnordavis@gmail.com:ojkUwKUwQ3rR7blIqBP80dxj");
-
+const getVideoLimit = async () => {
     try {
-        const response = await fetch(
-            "https://quick-vid.com/wp-json/pmpro/v1/get_membership_levels_for_user?user_id=4",
-            {
-                method: "GET",
-                headers: {
-                    "Authorization": `Basic ${auth}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+        const response = await fetch('https://your-wordpress-site.com/wp-admin/admin-ajax.php?action=get_video_limit', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',  // Include cookies to maintain session (this assumes the user is logged in)
+        });
 
         const data = await response.json();
-        console.log("Membership Levels:", data); // Debugging
-        return data; // List of levels
+
+        if (data.success) {
+            console.log('Video Limit:', data.data.video_limit);
+        } else {
+            console.error('Error:', data.data.message);
+        }
     } catch (error) {
-        console.error("Error fetching membership levels:", error);
+        console.error('Error:', error);
     }
 };
+
+// Call the function to get the video limit
+getVideoLimit();
 const redditStory = () => {
     const [videoUrl, setVideoUrl] = useState('');
     const [videoStartTime, setVideoStartTime] = useState('');
@@ -39,8 +36,8 @@ const redditStory = () => {
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
 
+    getVideoLimit();
 
-    getMembershipLevels();
     const handleDownload = async () => {
         if (!videoUrl) {
             alert('Please enter a valid YouTube URL');
