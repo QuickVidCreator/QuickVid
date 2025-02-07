@@ -2,6 +2,32 @@ import { useState } from 'react';
 import './redditstory.css'; // Import the CSS file
 import './global.css';
 
+const getMembershipLevels = async () => {
+    const auth = btoa("imconnordavis@gmail.com:ojkUwKUwQ3rR7blIqBP80dxj");
+
+    try {
+        const response = await fetch(
+            "https://quick-vid.com/wp-json/pmpro/v1/get_membership_levels_for_user?user_id=4",
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": `Basic ${auth}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Membership Levels:", data); // Debugging
+        return data; // List of levels
+    } catch (error) {
+        console.error("Error fetching membership levels:", error);
+    }
+};
 const redditStory = () => {
     const [videoUrl, setVideoUrl] = useState('');
     const [videoStartTime, setVideoStartTime] = useState('');
@@ -13,6 +39,8 @@ const redditStory = () => {
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
 
+
+    getMembershipLevels();
     const handleDownload = async () => {
         if (!videoUrl) {
             alert('Please enter a valid YouTube URL');
