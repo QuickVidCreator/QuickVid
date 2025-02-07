@@ -3,7 +3,7 @@ import './redditstory.css'; // Import the CSS file
 import './global.css';
 const getVideoLimit = async (userId) => {
     try {
-        const response = await fetch(`https://yourwebsite.com/wp-json/custom/v1/video-limit/${userId}`, {
+        const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/video-limit/${userId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
