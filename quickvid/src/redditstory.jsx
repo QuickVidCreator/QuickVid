@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import './redditstory.css'; // Import the CSS file
 import './global.css';
+
+const videoBtnSet = true;
 const getVideoLimit = async (userId) => {
     try {
         // First get the current count
@@ -54,7 +56,15 @@ const redditStory = () => {
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
 
-    getVideoLimit(4);
+    const remainingVideos = getVideoLimit(4);
+    if (remainingVideos > 0) {
+        // Proceed with video generation
+        console.log(`Generated video. ${remainingVideos} videos remaining.`);
+    } else {
+        // Show error - no videos left
+        console.log('No videos remaining today');
+        const videoBtnSet = false;
+    }
 
     const handleDownload = async () => {
         if (!videoUrl) {
@@ -191,9 +201,10 @@ const redditStory = () => {
                 onChange={(e) => setVideoOutro(e.target.value)}
                 placeholder="Enter Video Outro"
                 className="text-input" />
+            <h2 className="QATitles" disabled={videoBtnSet} >Set the video outro</h2>
             <button
                 onClick={handleDownload}
-                disabled={isDownloading}
+                disabled={isDownloading || !videoBtnSet}
                 className={`download-button ${isDownloading ? 'disabled' : ''}`}>
                 {isDownloading ? 'Generating...' : 'Generate Video'}
             </button>
