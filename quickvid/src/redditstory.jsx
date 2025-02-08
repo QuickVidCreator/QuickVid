@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './redditstory.css'; // Import the CSS file
 import './global.css';
 
-const videoBtnSet = true;
+let videoBtnSet = true;
 const getVideoLimit = async (userId) => {
     try {
         // First get the current count
@@ -63,7 +63,7 @@ const redditStory = () => {
     } else {
         // Show error - no videos left
         console.log('No videos remaining today');
-        const videoBtnSet = false;
+        videoBtnSet = false;
     }
 
     const handleDownload = async () => {
