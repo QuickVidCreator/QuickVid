@@ -5,43 +5,42 @@ import './global.css';
 let videoBtnSet = true;
 const getVideoLimit = async (userId) => {
     try {
-        // First get the current count
         const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
         });
         const data = await response.json();
 
-        if (data.videoCount > 0) {
-            // If we have videos remaining, decrease the count
-            const updateResponse = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-            });
-            const updateData = await updateResponse.json();
-
-            if (updateData.success) {
-                console.log('Videos remaining:', updateData.videoCount);
-                return updateData.videoCount; // Return remaining count
-            } else {
-                console.error('Error updating count:', updateData.error);
-                return null;
-            }
-        } else {
-            console.log('No videos remaining today');
-            return 0;
-        }
+        return data.videoCount ?? 0; // Return the video count or 0 if undefined
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching video count:', error);
         return null;
     }
 };
+
+const updateVideoLimit = async (userId) => {
+    try {
+        const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            console.log('Videos remaining:', data.videoCount);
+            return data.videoCount;
+        } else {
+            console.error('Error updating count:', data.error);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error updating video count:', error);
+        return null;
+    }
+};
+
 
 // Call the function to get the video limit
 //getVideoLimit();
@@ -67,6 +66,7 @@ const redditStory = () => {
     }
 
     const handleDownload = async () => {
+        updateVideoLimit(4);
         if (!videoUrl) {
             alert('Please enter a valid YouTube URL');
             return;
