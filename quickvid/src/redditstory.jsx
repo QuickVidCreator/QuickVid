@@ -1,4 +1,6 @@
-import { useState } from 'react';
+//import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 import './redditstory.css'; // Import the CSS file
 import './global.css';
 
@@ -55,14 +57,21 @@ const redditStory = () => {
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
 
-    const remainingVideos = getVideoLimit(2);
-    if (remainingVideos > 0) {
-        // Proceed with video generation
-        console.log(`Generated video. ${remainingVideos} videos remaining.`);
-    } else {
-        // Show error - no videos left
-        console.log('No videos remaining today');
-        videoBtnSet = false;
+    const [videoLimit, setVideoLimit] = useState(null);
+    const userId = 2; // Replace with dynamic user ID if needed
+
+    useEffect(() => {
+        const fetchVideoLimit = async () => {
+            const limit = await getVideoLimit(userId);
+            console.log("Fetched video count:", limit);
+            setVideoLimit(limit);
+        };
+
+        fetchVideoLimit();
+    }, []);
+
+    if (videoLimit === null) {
+        return <p>Loading video count...</p>; // Prevents incorrect early check
     }
 
     const handleDownload = async () => {
