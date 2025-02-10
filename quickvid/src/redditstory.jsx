@@ -55,7 +55,7 @@ const redditStory = () => {
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
 
-    const remainingVideos = await getVideoLimit(4);
+    const remainingVideos = getVideoLimit(4);
     if (remainingVideos > 0) {
         // Proceed with video generation
         console.log(`Generated video. ${remainingVideos} videos remaining.`);
