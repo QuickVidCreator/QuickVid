@@ -3,41 +3,22 @@ import './redditstory.css'; // Import the CSS file
 import './global.css';
 
 let videoBtnSet = true;
-//const getVideoLimit = async (userId) => {
-//    try {
-//        const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {
-//            method: 'GET',
-//            headers: { 'Content-Type': 'application/json' },
-//            credentials: 'include',
-//        });
-//        const data = await response.json();
-//        console.log('Current video count:', data.videoCount); // Debug log
-//        return data.videoCount;
-//    } catch (error) {
-//        console.error('Error:', error);
-//        return null;
-//    }
-//};
 const getVideoLimit = async (userId) => {
     try {
         const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {
             method: 'GET',
-            headers: {
-            'Content-Type': 'application/json',
-        },
-            credentials: 'include', // Include cookies for logged-in users
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
         });
-    const data = await response.json();
-    console.log(data); // Log the response
-    if (data.video_limit !== undefined) {
-        console.log('Video Limit:', data.video_limit); // Display video limit
-    } else {
-        console.error('Error:', data.error);
+        const data = await response.json();
+        console.log('Current video count:', data.videoCount); // Debug log
+        return data.videoCount;
+    } catch (error) {
+        console.error('Error:', error);
+        return null;
     }
-} catch (error) {
-    console.error('Error fetching video limit:', error);
-}
 };
+
 const updateVideoLimit = async (userId) => {
     try {
         const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {
@@ -74,7 +55,7 @@ const redditStory = () => {
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
 
-    const remainingVideos = getVideoLimit(4);
+    const remainingVideos = getVideoLimit(2);
     if (remainingVideos > 0) {
         // Proceed with video generation
         console.log(`Generated video. ${remainingVideos} videos remaining.`);
@@ -85,7 +66,7 @@ const redditStory = () => {
     }
 
     const handleDownload = async () => {
-        updateVideoLimit(4);
+        updateVideoLimit(2);
         if (!videoUrl) {
             alert('Please enter a valid YouTube URL');
             return;
