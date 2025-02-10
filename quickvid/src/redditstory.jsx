@@ -11,10 +11,10 @@ const getVideoLimit = async (userId) => {
             credentials: 'include',
         });
         const data = await response.json();
-
-        return data.videoCount ?? 0; // Return the video count or 0 if undefined
+        console.log('Current video count:', data.videoCount); // Debug log
+        return data.videoCount;
     } catch (error) {
-        console.error('Error fetching video count:', error);
+        console.error('Error:', error);
         return null;
     }
 };
@@ -55,7 +55,7 @@ const redditStory = () => {
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
 
-    const remainingVideos = getVideoLimit(4);
+    const remainingVideos = await getVideoLimit(4);
     if (remainingVideos > 0) {
         // Proceed with video generation
         console.log(`Generated video. ${remainingVideos} videos remaining.`);
