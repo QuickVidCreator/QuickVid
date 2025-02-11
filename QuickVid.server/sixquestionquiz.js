@@ -79,29 +79,27 @@ const processQuestionsToWords = async (text) => {
 };
 //let currentTime = 0;
 //let timeline = 0;
-const generateText = async (text) => {
-    const durations = await processTextToWords(text);
-    currentTime = timeline;
-    //let currentTime = 0; // Cumulative time tracker
+const generateText = async (text, times) => {
     let drawTextCommands = '';
+    const words = text.split(' '); // Split text into words
 
-    for (const { word, duration } of durations) {
-        const startTime = currentTime / 1000; // Convert ms to seconds
-        const endTime = (currentTime + duration) / 1000;
-        console.log("starting: " + startTime + " Ending: " + endTime);
+    words.forEach((word, index) => {
+        if (index >= times.length) return; // Prevent out-of-bounds errors
+
+        const startTime = times[index]; // Use directly since times[] is in seconds
+        const endTime = times[index + 1] ?? startTime + 1; // Use next time or add 1s for last word
+
+        console.log(`Word: ${word}, Start: ${startTime}, End: ${endTime}`);
+
         drawTextCommands += `drawtext=text='${word}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=100:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime},${endTime})',`;
+    });
 
-        currentTime += duration; // Update cumulative time
-    }
-
-    // Remove the trailing comma
-    return drawTextCommands.trim().slice(0, -1);
+    // Remove trailing comma
+    return drawTextCommands.slice(0, -1);
 };
 
-//let answerLocationX = 200;
-//let answerLocationY = 1005;
+
 const generateAnswers = async (text) => {
-    const durations = await processTextToWords(text);
     let drawTextCommands = '';
 
     currentTime = timeline;
@@ -127,42 +125,6 @@ const generateAnswers = async (text) => {
     return drawTextCommands.trim().slice(0, -1);
 };
 
-const generateQuestions = async (text) => {
-    const durations = await processQuestionsToWords(text);
-    let drawTextCommands = '';
-
-    currentTime = timeline;
-
-    for (const { word, duration } of durations) {
-        const startTime = currentTime / 1000; // Convert milliseconds to seconds for FFmpeg
-        const endTime = (currentTime + duration) / 1000;
-
-        console.log("starting: " + startTime + " Ending: " + endTime);
-        drawTextCommands += `drawtext=text='${word}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=100:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime},${endTime})',`;
-
-        currentTime += duration; // Add the duration of the current word to the cumulative timeline
-    }
-
-    // Remove the trailing comma at the end of the generated commands
-    return drawTextCommands.trim().slice(0, -1);
-};
-
-
-// Define the merge function
-const merge = (...streams) => {
-    const pass = new PassThrough();
-    const appendNextStream = (index) => {
-        if (index >= streams.length) {
-            pass.end(); // End the PassThrough stream after the last input stream
-            return;
-        }
-        const currentStream = streams[index];
-        currentStream.pipe(pass, { end: false });
-        currentStream.on('end', () => appendNextStream(index + 1));
-    };
-    appendNextStream(0); // Start with the first stream
-    return pass;
-};
 async function generateSpeech(VideoHook, Question1, Question1A, Question2, Question2A, Question3, Question3A, Question4, Question4A, Question5, Question5A, Question6, Question6A, VideoOutro) {
     const client = new textToSpeech.v1beta1.TextToSpeechClient({
         credentials: {
@@ -234,11 +196,11 @@ async function generateSpeech(VideoHook, Question1, Question1A, Question2, Quest
         //await fsp.writeFile('output.mp3', response.audioContent);
 
         // Print timepoints with words
-        response.timepoints.forEach(point => {
-            const wordIndex = point.markName.split('_')[1];
-            const word = text.split(' ')[wordIndex];
-            console.log(`Word: ${word}, Time: ${point.timeSeconds} seconds`);
-        });
+        //response.timepoints.forEach(point => {
+            //const wordIndex = point.markName.split('_')[1];
+            //const word = text.split(' ')[wordIndex];
+            //console.log(`Word: ${word}, Time: ${point.timeSeconds} seconds`);
+        //});
         const timePoints = response.timepoints.map(point => point.timeSeconds);
         console.log(timePoints);
         const audioStream = new Readable({
@@ -300,8 +262,101 @@ async function processSixQuestionQuiz(req, res) {
     }
 
     try {
-        const FullSpeech = VideoHook + Question1 + Question1A + Question2 + Question2A;
+        const FullSpeech = VideoHook + " " + Question1 + " " + Question1A + " " + Question2 + " " + Question2A + " " + Question3 + " " + Question3A + " " + Question4 + " " + Question4A + " " + Question5 + " " + Question5A + " " + Question6 + " " + Question6A + " " + VideoOutro;
         const { audioStream: finalStream, timePoints } = await generateSpeech(VideoHook, Question1, Question1A, Question2, Question2A, Question3, Question3A, Question4, Question4A, Question5, Question5A, Question6, Question6A, VideoOutro);
+        const wordGenerationLines = await generateText(FullSpeech, timePoints);
+        //VIDEO HOOK TIMING
+        const getVideoHookCount = (VideoHook) => {
+            return VideoHook.split(' ').length;
+        };
+        let timeTrack = 0;
+        let timeTrackOld = 0;
+        timeTrack += getVideoHookCount(VideoHook);
+        const VideoHookTiming = timePoints.slice(0, timeTrack);
+        //QUESTION ONE TIMING
+        const getQuestion1Count = (Question1) => {
+            return Question1.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion1Count(Question1);
+        const Question1Timing = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION ONE ANSWER TIMING
+        const getQuestion1ACount = (Question1A) => {
+            return Question1A.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion1ACount(Question1A);
+        const Question1ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION TWO TIMING
+        const getQuestion2Count = (Question2) => {
+            return Question2.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion2Count(Question2);
+        const Question2Timing = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION TWO ANSWER TIMING
+        const getQuestion2ACount = (Question2A) => {
+            return Question2A.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion2ACount(Question2A);
+        const Question2ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION THREE TIMING
+        const getQuestion3Count = (Question3) => {
+            return Question3.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion3Count(Question3);
+        const Question3Timing = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION THREE ANSWER TIMING
+        const getQuestion3ACount = (Question3A) => {
+            return Question3A.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion3ACount(Question3A);
+        const Question3ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION FOUR TIMING
+        const getQuestion4Count = (Question4) => {
+            return Question4.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion4Count(Question4);
+        const Question4Timing = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION FOUR ANSWER TIMING
+        const getQuestion4ACount = (Question4A) => {
+            return Question4A.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion4ACount(Question4A);
+        const Question4ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION FIVE TIMING
+        const getQuestion5Count = (Question5) => {
+            return Question5.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion5Count(Question5);
+        const Question5Timing = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION FIVE ANSWER TIMING
+        const getQuestion5ACount = (Question5A) => {
+            return Question5A.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion5ACount(Question5A);
+        const Question5ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION SIX TIMING
+        const getQuestion6Count = (Question6) => {
+            return Question6.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion6Count(Question6);
+        const Question6Timing = timePoints.slice(timeTrackOld, timeTrack);
+        //QUESTION SIX ANSWER TIMING
+        const getQuestion6ACount = (Question6A) => {
+            return Question6A.split(' ').length;
+        };
+        timeTrackOld = timeTrack;
+        timeTrack += getQuestion6ACount(Question6A);
+        const Question6ATiming = timePoints.slice(timeTrackOld, timeTrack);
 
         // Convert the audio stream to a buffer
         //const audioBuffer = await streamToBuffer(audioStream2);
@@ -391,7 +446,7 @@ async function processSixQuestionQuiz(req, res) {
             '-i', 'pipe:3',              // Video stream input
             '-thread_queue_size', '1024', // Increase thread queue for audio input
             '-i', 'pipe:4',              // Audio input
-            '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2`, // Text overlay
+            '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${wordGenerationLines}`, // Text overlay
             '-c:v', 'libx264',           // Video codec (H.264)
             '-c:a', 'aac',               // Audio codec (AAC)
             '-preset', 'ultrafast',       // Use ultrafast encoding preset
