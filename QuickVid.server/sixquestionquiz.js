@@ -9,6 +9,9 @@ const fs = require('fs');
 const path = require('path');
 const getMP3Duration = require('get-mp3-duration'); // Added this import
 const { PassThrough } = require('stream'); // Use require for consistency
+const { Readable } = require('stream'); // Use require for consistency
+const textToSpeech = require('@google-cloud/text-to-speech');
+const fsp = require('fs').promises;
 
 const mime = require('mime-types');
 const cors = require('cors');
@@ -160,7 +163,95 @@ const merge = (...streams) => {
     appendNextStream(0); // Start with the first stream
     return pass;
 };
+async function generateSpeech(VideoHook, Question1, Question1A, Question2, Question2A, Question3, Question3A, Question4, Question4A, Question5, Question5A, Question6, Question6A, VideoOutro) {
+    const client = new textToSpeech.v1beta1.TextToSpeechClient({
+        credentials: {
+            client_email: 'quickvid@quickvid-448819.iam.gserviceaccount.com',
+            private_key: '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDe78lnqUm9EnDl\niDTaQ0azPCruq7Consb6wUgvEsyASb0Q3++r2cd6gIOfILUsdMO3tUe198KZ9asu\nnqjaGDnwsYX31LoanlHWD4RI7IGyHWwT2ifeLnrq83mprSYFKooPJXeqF8JJkGT9\nN/IUEhR5bNCjQp73EbmgX92/gMQoHDWobnZXakciDsaVUN+CLk1k1wL3VAtNhonf\nMO/0MuflHTNlPIsTvyH/QCxCndndHDS+cHY0h6VqZ6LydgEmoNCJ6FWVBDin8xos\ndvIF8aCwstbP/eDRg5jJm2ewOxNDQcfBNwJ36XhoQfOsHY6MtP7jIylCwK4xLxTY\n46bMUW9JAgMBAAECggEASBxa0s+E3QYOg4hDxEfXohk3r9zUNy6ooSqM3UEg6eww\nHjm5Liay6fKQ4JN1Vuxr9EvMZtU92owG83z5lBYbA7qAYXIrQnnscaeyO95Yc1Mm\nBuPdWnZBZycbNuGddzVT0+NkKh4mR6JPsEJ86LYSblZexDhD8BoJJ5Fqyktt56Th\nsDpTUmWa68QVx23Dco/3cpG+U6NmFBCVO3mykhwgMeg5I2dYFgwt7d67M6lQvn4l\noPRPfAsHa50+ox5qJr11h30Tm9v3Qy66MsNgGOV0VJWl7iClHw7D7WZ7AMeT80ml\nDhHwLA3jwcHo5pEbXs8adufj2xSI1vLKrViJVjjeowKBgQD1s5VjG/T7ItKkMAKf\nWsLg/Hwqb+Umn0Zu664o8Hk22HzLYaSpj+9RqzCaQ63E0BUCTRx2QuUtSLxmlxU+\nHNJWc+FHyxsrThs1o7ax06dQPg9rYLVF9IC87tgM+g9Ayewu0Xh6fOCK0SqBm6mE\nQRQ9I0uVjNst42mQeYQ+lDvcrwKBgQDoR+7S8PXQuTK7fkE9ZxZJBgh8jRaVINjF\nRmdSQcVp/egSnWElJMSTuQRYMBH1HH/Luez6NZsoUT3YajgaiRPeyP3L0pMANcoi\nF+ch1t2nnsuzOBZ9wDqGWia+YWNrNf7hE+/lcgc4uKZRlEjOxzxKYwmLsTTG9mwB\nfmNdreqhhwKBgECJQQ3dRAXK6cUSjz3IGzP5XavP5EK2x0tPQFmkgFI1nuHU7elT\n0yqCaqu6ZyQw+7O1CWrOu1+foUzZFk1QSLdIjL3MzYAcbe0y6UPgMixTgL1Vk4ei\nZ0Y4/iq6a9M6tny9rIWP03Li6eVNO8NvTJ+aa7oGW3O8Lfgy0teVG/wlAoGBAKE5\ntKJD0Et1EKqlQsFM+WHsRx20jHUsXGnpqTOmJVGhhGDPTiuK7sseQ862ZvB8PJP6\n1GsDpFOCuGurpo98kAc1+TttSM1/iHLLpomNa0K6bOdTygC02aqBjpzcWjaDPwuZ\nXA0lba/IMuEzDKpCDi4PugN1F432YxdSU8QlQFOnAoGAI//wNo3LGdVXfyGVnWYp\n9bGYQwQtRK3+gnxRDWjpC/fdpI3nF2kRVG9KPLzbN2HOVnoiFdQXSHxBiuS0SPFH\nU1K97+NbhClB3COdPjdW1fEXUyZnvOBnZHAciWTRtysoUayESMm4ZC8ybtMDaDsZ\nCtuiydA9LtWJCeaDj5XR3+8=\n-----END PRIVATE KEY-----\n'
+        }
+    });
 
+    // Add a mark at the end of each word
+    const ssmlText2 = VideoHook.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ1 = Question1.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ1A = Question1A.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ2 = Question2.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ2A = Question2A.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ3 = Question3.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ3A = Question3A.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ4 = Question4.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ4A = Question4A.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ5 = Question5.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ5A = Question5A.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ6 = Question6.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlTextQ6A = Question6A.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlText15 = VideoOutro.split(' ')
+        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .join(' ');
+    const ssmlText = ssmlText2 + ssmlTextQ1 + "<break time='5s'/>" + ssmlTextQ1A + ssmlTextQ2 + "<break time='5s'/>" + ssmlTextQ2A + ssmlTextQ3 + "<break time='5s'/>" + ssmlTextQ3A + ssmlTextQ4 + "<break time='5s'/>" + ssmlTextQ4A + ssmlTextQ5 + "<break time='5s'/>" + ssmlTextQ5A + ssmlTextQ6 + "<break time='5s'/>" + ssmlTextQ6A + ssmlText15;
+    const finalText = "<speak>" + ssmlText + "</speak>";
+
+    const request = {
+        input: {
+            ssml: finalText
+        },
+        voice: { languageCode: 'en-US' },
+        audioConfig: {
+            audioEncoding: 'MP3',
+        },
+        enableTimePointing: ["SSML_MARK"]
+    };
+
+    try {
+        const [response] = await client.synthesizeSpeech(request);
+
+        //await fsp.writeFile('output.mp3', response.audioContent);
+
+        // Print timepoints with words
+        response.timepoints.forEach(point => {
+            const wordIndex = point.markName.split('_')[1];
+            const word = text.split(' ')[wordIndex];
+            console.log(`Word: ${word}, Time: ${point.timeSeconds} seconds`);
+        });
+        const timePoints = response.timepoints.map(point => point.timeSeconds);
+        console.log(timePoints);
+        const audioStream = new Readable({
+            read() { }
+        });
+        audioStream.push(Buffer.from(response.audioContent));
+        audioStream.push(null);
+        return { audioStream, timePoints };
+
+    } catch (error) {
+        console.error('TTS Error:', error);
+    }
+}
 async function processSixQuestionQuiz(req, res) {
     const {
         videoUrl,
@@ -210,98 +301,7 @@ async function processSixQuestionQuiz(req, res) {
 
     try {
         const FullSpeech = VideoHook + Question1 + Question1A + Question2 + Question2A;
-
-        //const wordDurations = await processTextToWords(VideoHook);
-
-        // Generate Text-to-Speech audio using Question1 input
-        const VideoHookGTTS = new gTTS(VideoHook, 'en', 'us');
-        const Question1GTTS = new gTTS(Question1, 'en', 'us');
-        const Question1AGTTS = new gTTS(Question1A, 'en', 'us');
-        const Question2GTTS = new gTTS(Question2, 'en', 'us');
-        const Question2AGTTS = new gTTS(Question2A, 'en', 'us');
-        const Question3GTTS = new gTTS(Question3, 'en', 'us');
-        const Question3AGTTS = new gTTS(Question3A, 'en', 'us');
-        const Question4GTTS = new gTTS(Question4, 'en', 'us');
-        const Question4AGTTS = new gTTS(Question4A, 'en', 'us');
-        const Question5GTTS = new gTTS(Question5, 'en', 'us');
-        const Question5AGTTS = new gTTS(Question5A, 'en', 'us');
-        const Question6GTTS = new gTTS(Question6, 'en', 'us');
-        const Question6AGTTS = new gTTS(Question6A, 'en', 'us');
-        const VideoOutroGTTS = new gTTS(VideoOutro, 'en', 'us');
-
-        // Create a readable stream for the generated audio using .stream()
-        const VideoHookStream = VideoHookGTTS.stream();
-        const VHStreamTime = VideoHookGTTS.stream();
-        const Question1Stream = Question1GTTS.stream();
-        const Q1Time = Question1GTTS.stream();
-        const Question1AStream = Question1AGTTS.stream();
-        const Q1ATime = Question1AGTTS.stream();
-        const Question2Stream = Question2GTTS.stream();
-        const Q2Time = Question2GTTS.stream();
-        const Question2AStream = Question2AGTTS.stream();
-        const Q2ATime = Question2AGTTS.stream();
-        const Question3Stream = Question3GTTS.stream();
-        const Q3Time = Question3GTTS.stream();
-        const Question3AStream = Question3AGTTS.stream();
-        const Q3ATime = Question3AGTTS.stream();
-        const Question4Stream = Question4GTTS.stream();
-        const Q4Time = Question4GTTS.stream();
-        const Question4AStream = Question4AGTTS.stream();
-        const Q4ATime = Question4AGTTS.stream();
-        const Question5Stream = Question5GTTS.stream();
-        const Q5Time = Question5GTTS.stream();
-        const Question5AStream = Question5AGTTS.stream();
-        const Q5ATime = Question5AGTTS.stream();
-        const Question6Stream = Question6GTTS.stream();
-        const Q6Time = Question6GTTS.stream();
-        const Question6AStream = Question6AGTTS.stream();
-        const Q6ATime = Question6AGTTS.stream();
-        const VideoOutroStream = VideoOutroGTTS.stream();
-        const VideoOutroTime = VideoOutroGTTS.stream();
-
-        //Create the timeline
-        const timelineBuffer1 = await streamToBuffer(VHStreamTime);
-        const timelineBuffer2 = await streamToBuffer(Q1Time);
-        const timelineBuffer3 = await streamToBuffer(Q1ATime);
-        const timelineBuffer4 = await streamToBuffer(Q2Time);
-        const timelineBuffer5 = await streamToBuffer(Q2ATime);
-        const timelineBuffer6 = await streamToBuffer(Q3Time);
-        const timelineBuffer7 = await streamToBuffer(Q3ATime);
-        const timelineBuffer8 = await streamToBuffer(Q4Time);
-        const timelineBuffer9 = await streamToBuffer(Q4ATime);
-        const timelineBuffer10 = await streamToBuffer(Q5Time);
-        const timelineBuffer11 = await streamToBuffer(Q5ATime);
-        const timelineBuffer12 = await streamToBuffer(Q6Time);
-        const timelineBuffer13 = await streamToBuffer(Q6ATime);
-        const timelineBuffer14 = await streamToBuffer(VideoOutroTime);
-
-        const timer = fs.createReadStream(timerPath);
-        const timer2 = fs.createReadStream(timerPath);
-        const timer3 = fs.createReadStream(timerPath);
-        const timer4 = fs.createReadStream(timerPath);
-        const timer5 = fs.createReadStream(timerPath);
-        const timer6 = fs.createReadStream(timerPath);
-        const combinedStream = merge(VideoHookStream, Question1Stream);
-        const combinedStream2 = merge(combinedStream, timer);
-        const combinedStream3 = merge(combinedStream2, Question1AStream);
-        const combinedStream4 = merge(combinedStream3, Question2Stream);
-        const combinedStream5 = merge(combinedStream4, timer2);
-        const combinedStream6 = merge(combinedStream5, Question2AStream);
-        const combinedStream7 = merge(combinedStream6, Question3Stream);
-        const combinedStream8 = merge(combinedStream7, timer3);
-        const combinedStream9 = merge(combinedStream8, Question3AStream);
-        const combinedStream10 = merge(combinedStream9, Question4Stream);
-        const combinedStream11 = merge(combinedStream10, timer4);
-        const combinedStream12 = merge(combinedStream11, Question4AStream);
-        const combinedStream13 = merge(combinedStream12, Question5Stream);
-        const combinedStream14 = merge(combinedStream13, timer5);
-        const combinedStream15 = merge(combinedStream14, Question5AStream);
-        const combinedStream16 = merge(combinedStream15, Question6Stream);
-        const combinedStream17 = merge(combinedStream16, timer6);
-        const combinedStream18 = merge(combinedStream17, Question6AStream);
-        const finalStream = merge(combinedStream18, VideoOutroStream);
-
-        //const audioStream2 = gtts.stream();
+        const { audioStream: finalStream, timePoints } = await generateSpeech(VideoHook, Question1, Question1A, Question2, Question2A, Question3, Question3A, Question4, Question4A, Question5, Question5A, Question6, Question6A, VideoOutro);
 
         // Convert the audio stream to a buffer
         //const audioBuffer = await streamToBuffer(audioStream2);
@@ -372,35 +372,6 @@ async function processSixQuestionQuiz(req, res) {
         //const outputFilePath = path.join(__dirname, 'video.mp4');
         const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
 
-        // draw the texts
-        const hookDrawText = await generateText(VideoHook);
-        timeline = getMP3Duration(timelineBuffer1);
-        const Question1DrawText = await generateQuestions(Question1);
-        timeline += getMP3Duration(timelineBuffer2) + 5000;
-        const Question1ADrawText = await generateAnswers(Question1A);
-        timeline += getMP3Duration(timelineBuffer3);
-        const Question2DrawText = await generateQuestions(Question2);
-        timeline += getMP3Duration(timelineBuffer4) + 5000;
-        const Question2ADrawText = await generateAnswers(Question2A);
-        timeline += getMP3Duration(timelineBuffer5);
-        const Question3DrawText = await generateQuestions(Question3);
-        timeline += getMP3Duration(timelineBuffer6) + 5000;
-        const Question3ADrawText = await generateAnswers(Question3A);
-        timeline += getMP3Duration(timelineBuffer7);
-        const Question4DrawText = await generateQuestions(Question4);
-        timeline += getMP3Duration(timelineBuffer8) + 5000;
-        const Question4ADrawText = await generateAnswers(Question4A);
-        timeline += getMP3Duration(timelineBuffer9);
-        const Question5DrawText = await generateQuestions(Question5);
-        timeline += getMP3Duration(timelineBuffer10) + 5000;
-        const Question5ADrawText = await generateAnswers(Question5A);
-        timeline += getMP3Duration(timelineBuffer11);
-        const Question6DrawText = await generateQuestions(Question6);
-        timeline += getMP3Duration(timelineBuffer12) + 5000;
-        const Question6ADrawText = await generateAnswers(Question6A);
-        timeline += getMP3Duration(timelineBuffer13);
-        const VideoOutroDrawText = await generateText(VideoOutro);
-
         // Set up FFmpeg process
         const VideoTitleSet = `drawtext=text='${VideoTitle}':x=(w-text_w)/2:y=(h-text_h)/6:fontsize=100:fontcolor=white:fontfile='${fontPath}'`;
         const QuestionNum1 = `drawtext=text=1):x=100:y=1000:fontsize=70:fontcolor=white:fontfile='${fontPath}'`;
@@ -420,7 +391,7 @@ async function processSixQuestionQuiz(req, res) {
             '-i', 'pipe:3',              // Video stream input
             '-thread_queue_size', '1024', // Increase thread queue for audio input
             '-i', 'pipe:4',              // Audio input
-            '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${VideoTitleSet},${QuestionNum1}, ${QuestionNum2}, ${QuestionNum3},${QuestionNum4}, ${QuestionNum5}, ${QuestionNum6}, ${hookDrawText}, ${Question1DrawText}, ${Question1ADrawText}, ${Question2DrawText}, ${Question2ADrawText}, ${Question3DrawText}, ${Question3ADrawText}, ${Question4DrawText}, ${Question4ADrawText}, ${Question5DrawText}, ${Question5ADrawText}, ${Question6DrawText}, ${Question6ADrawText}, ${VideoOutroDrawText}`, // Text overlay
+            '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2`, // Text overlay
             '-c:v', 'libx264',           // Video codec (H.264)
             '-c:a', 'aac',               // Audio codec (AAC)
             '-preset', 'ultrafast',       // Use ultrafast encoding preset

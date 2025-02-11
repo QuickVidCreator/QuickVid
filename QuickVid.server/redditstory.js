@@ -128,7 +128,7 @@ async function processRedditStory(req, res) {
     const ffmpeg = spawn(ffmpegPath, [
         '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
         '-r', '45',
-        '-thread_queue_size', '1024', // Increase thread queue for audio input
+        //'-thread_queue_size', '1024', // Increase thread queue for audio input
         '-i', 'pipe:3',              // Video stream input
         '-thread_queue_size', '1024', // Increase thread queue for audio input
         '-i', 'pipe:4',              // Audio input
