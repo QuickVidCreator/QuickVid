@@ -177,15 +177,14 @@ async function generateSpeech(VideoHook, Question1, Question1A, Question2, Quest
         .map((word, index) => `${word} <mark name="outro_${index}"/>`)
         .join(' ');
 
-    // Add empty marks before breaks
-    const ssmlText = ssmlText2 + ' ' + ssmlTextQ1 + " <mark name='break1_start'/><break time='5s'/><mark name='break1_end'/> " +
-        ssmlTextQ1A + ' ' + ssmlTextQ2 + " <mark name='break2_start'/><break time='5s'/><mark name='break2_end'/> " +
-        ssmlTextQ2A + ' ' + ssmlTextQ3 + " <mark name='break3_start'/><break time='5s'/><mark name='break3_end'/> " +
-        ssmlTextQ3A + ' ' + ssmlTextQ4 + " <mark name='break4_start'/><break time='5s'/><mark name='break4_end'/> " +
-        ssmlTextQ4A + ' ' + ssmlTextQ5 + " <mark name='break5_start'/><break time='5s'/><mark name='break5_end'/> " +
-        ssmlTextQ5A + ' ' + ssmlTextQ6 + " <mark name='break6_start'/><break time='5s'/><mark name='break6_end'/> " +
-        ssmlTextQ6A + ' ' + ssmlText15;
-    const finalText = "<speak>" + ssmlText + "</speak>";
+    const ssmlText =
+        ssmlText2 + ssmlTextQ1 + "<mark name='end_q1'/>" + "<break time='5s'/>" + "<mark name='start_q1a'/>" + ssmlTextQ1A +
+        ssmlTextQ2 + "<mark name='end_q2'/>" + "<break time='5s'/>" + "<mark name='start_q2a'/>" + ssmlTextQ2A +
+        ssmlTextQ3 + "<mark name='end_q3'/>" + "<break time='5s'/>" + "<mark name='start_q3a'/>" + ssmlTextQ3A +
+        ssmlTextQ4 + "<mark name='end_q4'/>" + "<break time='5s'/>" + "<mark name='start_q4a'/>" + ssmlTextQ4A +
+        ssmlTextQ5 + "<mark name='end_q5'/>" + "<break time='5s'/>" + "<mark name='start_q5a'/>" + ssmlTextQ5A +
+        ssmlTextQ6 + "<mark name='end_q6'/>" + "<break time='5s'/>" + "<mark name='start_q6a'/>" + ssmlTextQ6A +
+        ssmlText15;    const finalText = "<speak>" + ssmlText + "</speak>";
 
     console.log(finalText);
 
