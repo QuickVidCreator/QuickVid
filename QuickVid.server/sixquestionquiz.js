@@ -264,7 +264,10 @@ async function processSixQuestionQuiz(req, res) {
     try {
         const FullSpeech = VideoHook + " " + Question1 + " " + Question1A + " " + Question2 + " " + Question2A + " " + Question3 + " " + Question3A + " " + Question4 + " " + Question4A + " " + Question5 + " " + Question5A + " " + Question6 + " " + Question6A + " " + VideoOutro;
         const { audioStream: finalStream, timePoints } = await generateSpeech(VideoHook, Question1, Question1A, Question2, Question2A, Question3, Question3A, Question4, Question4A, Question5, Question5A, Question6, Question6A, VideoOutro);
+        console.log(timePoints);
+        console.log(FullSpeech);
         const wordGenerationLines = await generateText(FullSpeech, timePoints);
+        console.log(wordGenerationLines);
         //VIDEO HOOK TIMING
         const getVideoHookCount = (VideoHook) => {
             return VideoHook.split(' ').length;
