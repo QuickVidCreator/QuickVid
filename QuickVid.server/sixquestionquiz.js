@@ -133,61 +133,119 @@ async function generateSpeech(VideoHook, Question1, Question1A, Question2, Quest
         }
     });
 
-    // Add a mark at the end of each word
     const createMarkedText = (word, prefix, index) => {
         return `<mark name="${prefix}_${index}_start"/>${word}<mark name="${prefix}_${index}_end"/> `;
     };
 
-    const ssmlText2 = VideoHook.split(' ')
-        .map((word, index) => createMarkedText(word, 'hook', index))
-        .join('');
-    const ssmlTextQ1 = Question1.split(' ')
-        .map((word, index) => createMarkedText(word, 'q1', index))
-        .join('');
-    const ssmlTextQ1A = Question1A.split(' ')
-        .map((word, index) => createMarkedText(word, 'q1a', index))
-        .join('');
-    const ssmlTextQ2 = Question2.split(' ')
-        .map((word, index) => createMarkedText(word, 'q2', index))
-        .join('');
-    const ssmlTextQ2A = Question2A.split(' ')
-        .map((word, index) => createMarkedText(word, 'q2a', index))
-        .join('');
-    const ssmlTextQ3 = Question3.split(' ')
-        .map((word, index) => createMarkedText(word, 'q3', index))
-        .join('');
-    const ssmlTextQ3A = Question3A.split(' ')
-        .map((word, index) => createMarkedText(word, 'q3a', index))
-        .join('');
-    const ssmlTextQ4 = Question4.split(' ')
-        .map((word, index) => createMarkedText(word, 'q4', index))
-        .join('');
-    const ssmlTextQ4A = Question4A.split(' ')
-        .map((word, index) => createMarkedText(word, 'q4a', index))
-        .join('');
-    const ssmlTextQ5 = Question5.split(' ')
-        .map((word, index) => createMarkedText(word, 'q5', index))
-        .join('');
-    const ssmlTextQ5A = Question5A.split(' ')
-        .map((word, index) => createMarkedText(word, 'q5a', index))
-        .join('');
-    const ssmlTextQ6 = Question6.split(' ')
-        .map((word, index) => createMarkedText(word, 'q6', index))
-        .join('');
-    const ssmlTextQ6A = Question6A.split(' ')
-        .map((word, index) => createMarkedText(word, 'q6a', index))
-        .join('');
-    const ssmlText15 = VideoOutro.split(' ')
-        .map((word, index) => createMarkedText(word, 'outro', index))
-        .join('');
+    // Function to wrap text segments in prosody tags
+    const wrapInProsody = (text) => {
+        return `<prosody rate="medium">${text}</prosody>`;
+    };
 
-    const ssmlText = ssmlText2 + ssmlTextQ1 + "<break time='5s'/>" +
-        ssmlTextQ1A + ssmlTextQ2 + "<break time='5s'/>" +
-        ssmlTextQ2A + ssmlTextQ3 + "<break time='5s'/>" +
-        ssmlTextQ3A + ssmlTextQ4 + "<break time='5s'/>" +
-        ssmlTextQ4A + ssmlTextQ5 + "<break time='5s'/>" +
-        ssmlTextQ5A + ssmlTextQ6 + "<break time='5s'/>" +
-        ssmlTextQ6A + ssmlText15;
+    // Process each section
+    const ssmlText2 = wrapInProsody(VideoHook.split(' ')
+        .map((word, index) => createMarkedText(word, 'hook', index))
+        .join(''));
+    const ssmlTextQ1 = wrapInProsody(Question1.split(' ')
+        .map((word, index) => createMarkedText(word, 'q1', index))
+        .join(''));
+    const ssmlTextQ1A = wrapInProsody(Question1A.split(' ')
+        .map((word, index) => createMarkedText(word, 'q1a', index))
+        .join(''));
+    // ... (repeat for other sections)
+    const ssmlTextQ2 = wrapInProsody(Question2.split(' ')
+        .map((word, index) => createMarkedText(word, 'q2', index))
+        .join(''));
+    const ssmlTextQ2A = wrapInProsody(Question2A.split(' ')
+        .map((word, index) => createMarkedText(word, 'q2a', index))
+        .join(''));
+    const ssmlTextQ3 = wrapInProsody(Question3.split(' ')
+        .map((word, index) => createMarkedText(word, 'q3', index))
+        .join(''));
+    const ssmlTextQ3A = wrapInProsody(Question3A.split(' ')
+        .map((word, index) => createMarkedText(word, 'q3a', index))
+        .join(''));
+    const ssmlTextQ4 = wrapInProsody(Question4.split(' ')
+        .map((word, index) => createMarkedText(word, 'q4', index))
+        .join(''));
+    const ssmlTextQ4A = wrapInProsody(Question4A.split(' ')
+        .map((word, index) => createMarkedText(word, 'q4a', index))
+        .join(''));
+    const ssmlTextQ5 = wrapInProsody(Question5.split(' ')
+        .map((word, index) => createMarkedText(word, 'q5', index))
+        .join(''));
+    const ssmlTextQ5A = wrapInProsody(Question5A.split(' ')
+        .map((word, index) => createMarkedText(word, 'q5a', index))
+        .join(''));
+    const ssmlTextQ6 = wrapInProsody(Question6.split(' ')
+        .map((word, index) => createMarkedText(word, 'q6', index))
+        .join(''));
+    const ssmlTextQ6A = wrapInProsody(Question6A.split(' ')
+        .map((word, index) => createMarkedText(word, 'q6a', index))
+        .join(''));
+    const ssmlText15 = wrapInProsody(VideoOutro.split(' ')
+        .map((word, index) => createMarkedText(word, 'outro', index))
+        .join(''));
+
+    // Combine all sections with proper breaks
+    const ssmlText = `${ssmlText2}${ssmlTextQ1}
+        <break time="5s" strength="strong"/>
+        ${ssmlTextQ1A}${ssmlTextQ2}
+        <break time="5s" strength="strong"/>
+        ${ssmlTextQ2A}${ssmlTextQ3}
+        <break time="5s" strength="strong"/>
+        ${ssmlTextQ3A}${ssmlTextQ4}
+        <break time="5s" strength="strong"/>
+        ${ssmlTextQ4A}${ssmlTextQ5}
+        <break time="5s" strength="strong"/>
+        ${ssmlTextQ5A}${ssmlTextQ6}
+        <break time="5s" strength="strong"/>
+        ${ssmlTextQ6A}${ssmlText15}`;
+    // Add a mark at the end of each word
+    //const ssmlText2 = VideoHook.split(' ')
+    //    .map((word, index) => `${word} <mark name="hook_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ1 = Question1.split(' ')
+    //    .map((word, index) => `${word} <mark name="q1_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ1A = Question1A.split(' ')
+    //    .map((word, index) => `${word} <mark name="q1a_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ2 = Question2.split(' ')
+    //    .map((word, index) => `${word} <mark name="q2_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ2A = Question2A.split(' ')
+    //    .map((word, index) => `${word} <mark name="q2a_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ3 = Question3.split(' ')
+    //    .map((word, index) => `${word} <mark name="q3_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ3A = Question3A.split(' ')
+    //    .map((word, index) => `${word} <mark name="q3a_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ4 = Question4.split(' ')
+    //    .map((word, index) => `${word} <mark name="q4_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ4A = Question4A.split(' ')
+    //    .map((word, index) => `${word} <mark name="q4a_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ5 = Question5.split(' ')
+    //    .map((word, index) => `${word} <mark name="q5_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ5A = Question5A.split(' ')
+    //    .map((word, index) => `${word} <mark name="q5a_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ6 = Question6.split(' ')
+    //    .map((word, index) => `${word} <mark name="q6_${index}"/>`)
+    //    .join(' ');
+    //const ssmlTextQ6A = Question6A.split(' ')
+    //    .map((word, index) => `${word} <mark name="q6a_${index}"/>`)
+    //    .join(' ');
+    //const ssmlText15 = VideoOutro.split(' ')
+    //    .map((word, index) => `${word} <mark name="outro_${index}"/>`)
+    //    .join(' ');
+
+    //const ssmlText = ssmlText2 + ssmlTextQ1 + "<break time='5s'/>" + ssmlTextQ1A + ssmlTextQ2 + "<break time='5s'/>" + ssmlTextQ2A + ssmlTextQ3 + "<break time='5s'/>" + ssmlTextQ3A + ssmlTextQ4 + "<break time='5s'/>" + ssmlTextQ4A + ssmlTextQ5 + "<break time='5s'/>" + ssmlTextQ5A + ssmlTextQ6 + "<break time='5s'/>" + ssmlTextQ6A + ssmlText15;
     const finalText = "<speak>" + ssmlText + "</speak>";
 
     console.log(finalText);
