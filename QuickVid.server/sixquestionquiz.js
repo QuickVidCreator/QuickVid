@@ -179,6 +179,8 @@ async function generateSpeech(VideoHook, Question1, Question1A, Question2, Quest
     const ssmlText = ssmlText2 + ssmlTextQ1 + "<break time='5s'/>" + ssmlTextQ1A + ssmlTextQ2 + "<break time='5s'/>" + ssmlTextQ2A + ssmlTextQ3 + "<break time='5s'/>" + ssmlTextQ3A + ssmlTextQ4 + "<break time='5s'/>" + ssmlTextQ4A + ssmlTextQ5 + "<break time='5s'/>" + ssmlTextQ5A + ssmlTextQ6 + "<break time='5s'/>" + ssmlTextQ6A + ssmlText15;
     const finalText = "<speak>" + ssmlText + "</speak>";
 
+    console.log(finalText);
+
     const request = {
         input: {
             ssml: finalText
