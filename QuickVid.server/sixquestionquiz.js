@@ -135,48 +135,56 @@ async function generateSpeech(VideoHook, Question1, Question1A, Question2, Quest
 
     // Add a mark at the end of each word
     const ssmlText2 = VideoHook.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="hook_${index}"/>`)
         .join(' ');
     const ssmlTextQ1 = Question1.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q1_${index}"/>`)
         .join(' ');
     const ssmlTextQ1A = Question1A.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q1a_${index}"/>`)
         .join(' ');
     const ssmlTextQ2 = Question2.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q2_${index}"/>`)
         .join(' ');
     const ssmlTextQ2A = Question2A.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q2a_${index}"/>`)
         .join(' ');
     const ssmlTextQ3 = Question3.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q3_${index}"/>`)
         .join(' ');
     const ssmlTextQ3A = Question3A.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q3a_${index}"/>`)
         .join(' ');
     const ssmlTextQ4 = Question4.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q4_${index}"/>`)
         .join(' ');
     const ssmlTextQ4A = Question4A.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q4a_${index}"/>`)
         .join(' ');
     const ssmlTextQ5 = Question5.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q5_${index}"/>`)
         .join(' ');
     const ssmlTextQ5A = Question5A.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q5a_${index}"/>`)
         .join(' ');
     const ssmlTextQ6 = Question6.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q6_${index}"/>`)
         .join(' ');
     const ssmlTextQ6A = Question6A.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="q6a_${index}"/>`)
         .join(' ');
     const ssmlText15 = VideoOutro.split(' ')
-        .map((word, index) => `${word} <mark name="word_${index}"/>`)
+        .map((word, index) => `${word} <mark name="outro_${index}"/>`)
         .join(' ');
-    const ssmlText = ssmlText2 + ssmlTextQ1 + "<break time='5s'/>" + ssmlTextQ1A + ssmlTextQ2 + "<break time='5s'/>" + ssmlTextQ2A + ssmlTextQ3 + "<break time='5s'/>" + ssmlTextQ3A + ssmlTextQ4 + "<break time='5s'/>" + ssmlTextQ4A + ssmlTextQ5 + "<break time='5s'/>" + ssmlTextQ5A + ssmlTextQ6 + "<break time='5s'/>" + ssmlTextQ6A + ssmlText15;
+
+    // Add empty marks before breaks
+    const ssmlText = ssmlText2 + ' ' + ssmlTextQ1 + " <mark name='break1_start'/><break time='5s'/><mark name='break1_end'/> " +
+        ssmlTextQ1A + ' ' + ssmlTextQ2 + " <mark name='break2_start'/><break time='5s'/><mark name='break2_end'/> " +
+        ssmlTextQ2A + ' ' + ssmlTextQ3 + " <mark name='break3_start'/><break time='5s'/><mark name='break3_end'/> " +
+        ssmlTextQ3A + ' ' + ssmlTextQ4 + " <mark name='break4_start'/><break time='5s'/><mark name='break4_end'/> " +
+        ssmlTextQ4A + ' ' + ssmlTextQ5 + " <mark name='break5_start'/><break time='5s'/><mark name='break5_end'/> " +
+        ssmlTextQ5A + ' ' + ssmlTextQ6 + " <mark name='break6_start'/><break time='5s'/><mark name='break6_end'/> " +
+        ssmlTextQ6A + ' ' + ssmlText15;
     const finalText = "<speak>" + ssmlText + "</speak>";
 
     console.log(finalText);
