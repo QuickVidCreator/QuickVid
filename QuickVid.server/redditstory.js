@@ -86,19 +86,27 @@ async function processRedditStory(req, res) {
         VideoOutro
     } = req.body;
     console.log("REDDIT STORY SUCCESS");
-        //generateSpeech('Hello world, how are you today?')
-        //.then(result => console.log(result.wordTimings));
+    //generateSpeech('Hello world, how are you today?')
+    //.then(result => console.log(result.wordTimings));
     const { audioStream: RedditAudio, timePoints } = await generateSpeech(VideoText);
-//DOWNLOAD VIDEO
+    //DOWNLOAD VIDEO
     const info = await ytdl.getInfo(videoUrl);
-    const format = ytdl.chooseFormat(info.formats, {
-        quality: 'highestvideo',
-        container: 'mp4'
-    });
+
+    let format = info.formats.find(format => format.qualityLabel === '1080p60' && format.container === 'mp4');
+    if (!format) {
+        format = info.formats.find(format => format.qualityLabel === '1440p60' && format.container === 'mp4');
+    }
+    if (!format) {
+        const format = ytdl.chooseFormat(info.formats, {
+            quality: 'highestvideo',
+            container: 'mp4'
+        });
+    }
     if (!format) {
         return res.status(400).send('No suitable format found.');
     }
-
+    console.log(format);
+    console.log(info);
     // Set headers for video download
     res.header('Content-Disposition', 'attachment; filename="video.mp4"');
     res.header('Content-Type', mime.lookup('mp4') || 'application/octet-stream');
@@ -110,30 +118,46 @@ async function processRedditStory(req, res) {
     const videoStream = ytdl(videoUrl, {
         format: format,
         begin: `${clipStartTime}s`,
+        highWaterMark: 1024 * 1024 * 10, // 10MB buffer (default is much smaller)
+    }).on('error', (err) => {
+        console.error('YT video stream error:', err);
+        res.status(500).send('Failed to process video.');
     });
+    const tempVideoPath = path.join(__dirname, `backgroundvideo-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
+    ytdl(videoUrl, { format: format, begin: `${clipStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
     // Stop stream after 60 seconds
     setTimeout(() => {
         videoStream.destroy();
         console.log("Snippet download stopped.");
     }, clipDuration * 1000);
-    await new Promise((resolve) => {
-        videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
+    await new Promise((resolve, reject) => {
+        videoStream.once('readable', resolve);
+        videoStream.once('error', reject);
     });
 
     let fpsCheck = format.fps;
-    
+
+    // Add this 5-second delay before starting FFmpeg
+    console.log("Video stream is ready, waiting 5 seconds before starting FFmpeg...");
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    console.log("5-second wait complete, starting FFmpeg process now...");
+
+    const VideoTitleSet = `drawtext=text='${VideoTitle}':x=(w-text_w)/2:y=(h-text_h)/6:fontsize=100:fontcolor=white:fontfile='${fontPath}'`;
+
     const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
     const RedditText = generateText(VideoText, timePoints);
     console.log(RedditText);
     const ffmpeg = spawn(ffmpegPath, [
+        '-f', 'mp4',  // Force input format
         '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
         '-r', '45',
         //'-thread_queue_size', '1024', // Increase thread queue for audio input
-        '-i', 'pipe:3',              // Video stream input
+        //'-i', 'pipe:3',              // Video stream input
+        '-i', tempVideoPath,         // Use the file instead of pipe:3
         '-thread_queue_size', '1024', // Increase thread queue for audio input
         '-i', 'pipe:4',              // Audio input
         //'-vf', `scale=1080:1920:flags=lanczos,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // High-quality scaling
-        '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${RedditText}`, // Text overlay
+        '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${VideoTitleSet},${RedditText}`, // Text overlay
         '-c:v', 'libx264',           // Video codec (H.264)
         '-c:a', 'aac',               // Audio codec (AAC)
         '-preset', 'ultrafast',               // Better quality than ultrafast
@@ -144,6 +168,7 @@ async function processRedditStory(req, res) {
         //'-map', '1:a',
         '-t', '60',                  // Set video duration to 60 seconds
         '-f', 'mp4',                 // Output format
+        '-movflags', 'frag_keyframe+empty_moov', // Add this line
         '-max_muxing_queue_size', '4096', // Increase muxing queue size
         outputFilePath               // Write to the temporary file
     ], {
@@ -155,13 +180,13 @@ async function processRedditStory(req, res) {
     });
 
     // Pipe video and audio streams into FFmpeg
-    videoStream.pipe(ffmpeg.stdio[3]).on('error', (err) => {
-        if (err.code === 'EPIPE') {
-            console.warn('Video stream ended unexpectedly (EPIPE)');
-        } else {
-            console.error('Error in video stream:', err);
-        }
-    });
+    //videoStream.pipe(ffmpeg.stdio[3]).on('error', (err) => {
+    //if (err.code === 'EPIPE') {
+    //console.warn('Video stream ended unexpectedly (EPIPE)');
+    //} else {
+    //console.error('Error in video stream:', err);
+    //}
+    //});
 
     RedditAudio.pipe(ffmpeg.stdio[4]).on('error', (err) => {
         if (err.code === 'EPIPE') {
@@ -211,6 +236,10 @@ async function processRedditStory(req, res) {
                 // Cleanup temporary files after sending response
                 fs.unlink(outputFilePath, (err) => {
                     if (err) console.error('Error removing temporary output file:', err);
+                });
+                // Cleanup temporary files after sending response
+                fs.unlink(tempVideoPath, (err) => {
+                    if (err) console.error('Error removing temporary video file:', err);
                 });
             });
         });
