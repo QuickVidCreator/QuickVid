@@ -135,7 +135,6 @@ async function processRedditStory(req, res) {
         videoStream.once('error', reject);
     });
 
-    let fpsCheck = format.fps;
 
     // Add this 5-second delay before starting FFmpeg
     console.log("Video stream is ready, waiting 5 seconds before starting FFmpeg...");

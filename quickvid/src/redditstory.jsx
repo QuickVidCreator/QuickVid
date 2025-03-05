@@ -131,7 +131,7 @@ const redditStory = () => {
         setShowProgress(true);
 
         const interval = setInterval(() => {
-            progress += (progress < 0.7 ? 0.0035 : (progress < 0.8 ? 0.003 : 0.001));
+            progress += (progress < 0.7 ? 0.003 : (progress < 0.8 ? 0.0020 : 0.001));
             setProgressValue(progress);
 
             if (progress >= 1) {
@@ -198,7 +198,6 @@ const redditStory = () => {
             {/*    onChange={(e) => setVideoOutro(e.target.value)}*/}
             {/*    placeholder="Enter Video Outro"*/}
             {/*    className="text-input" />*/}
-            <h2 className="QATitles" disabled={videoBtnSet} >Set the video outro</h2>
             <button
                 onClick={handleDownload}
                 disabled={isDownloading || !videoBtnSet}

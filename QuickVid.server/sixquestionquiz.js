@@ -382,10 +382,18 @@ async function processSixQuestionQuiz(req, res) {
         console.log("post proxy");
 
         //const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
-        const format = ytdl.chooseFormat(info.formats, {
-            quality: 'highest',
-            container: 'mp4'
-        });
+        const info = await ytdl.getInfo(videoUrl);
+
+        let format = info.formats.find(format => format.qualityLabel === '1080p60' && format.container === 'mp4');
+        if (!format) {
+            format = info.formats.find(format => format.qualityLabel === '1440p60' && format.container === 'mp4');
+        }
+        if (!format) {
+            const format = ytdl.chooseFormat(info.formats, {
+                quality: 'highestvideo',
+                container: 'mp4'
+            });
+        }
         if (!format) {
             return res.status(400).send('No suitable format found.');
         }
@@ -397,38 +405,32 @@ async function processSixQuestionQuiz(req, res) {
         res.header('Connection', 'keep-alive'); // Prevents premature disconnect
 
 
-        //const videoStream = ytdl(videoUrl, { format: format, agent });
-        //const videoStream = ytdl(videoUrl, { format: format});
-
-        //const videoStream = ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 32 });
         const clipStartTime = videoStartTime;
-        const clipDuration = 10; // Clip length (60 seconds)
+        const clipDuration = 40; // Clip length (60 seconds)
 
-        //const videoStream = ytdl(videoUrl, { fmt: "mp4", begin: `${clipStartTime}s` });
-        //const videoStream = ytdl(videoUrl, {
-        //    fmt: "mp4",
-        //    filter: 'videoonly',
-        //    begin: `${clipStartTime}s`,
-        //    highWaterMark: 1024 * 1024 * 32  // 32MB buffer
-        //});
-        //const videoStream = ytdl(videoUrl, {
-            //fmt: "mp4",
-            //quality: 'lowestvideo',
-            //begin: `${clipStartTime}s`,
-            //highWaterMark: 1024 * 1024 * 32  // 32MB buffer
-        //});
         const videoStream = ytdl(videoUrl, {
             format: format,
             begin: `${clipStartTime}s`,
+            highWaterMark: 1024 * 1024 * 10, // 10MB buffer (default is much smaller)
+        }).on('error', (err) => {
+            console.error('YT video stream error:', err);
+            res.status(500).send('Failed to process video.');
         });
+        const tempVideoPath = path.join(__dirname, `backgroundvideo-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
+        ytdl(videoUrl, { format: format, begin: `${clipStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
         // Stop stream after 60 seconds
         setTimeout(() => {
             videoStream.destroy();
             console.log("Snippet download stopped.");
         }, clipDuration * 1000);
-        await new Promise((resolve) => {
-            videoStream.once('readable', resolve); // Ensures some data is buffered before starting ffmpeg
+        await new Promise((resolve, reject) => {
+            videoStream.once('readable', resolve);
+            videoStream.once('error', reject);
         });
+        // Add this 5-second delay before starting FFmpeg
+        console.log("Video stream is ready, waiting 5 seconds before starting FFmpeg...");
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        console.log("5-second wait complete, starting FFmpeg process now...");
         //const outputFilePath = path.join('/tmp', 'output.mp4');
         //const outputFilePath = path.join(__dirname, 'video.mp4');
         const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
@@ -448,8 +450,12 @@ async function processSixQuestionQuiz(req, res) {
         //const Question5Ans = `drawtext=text='${Question5A}':x=200:y=1600:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         //const Question6Ans = `drawtext=text='${Question6A}':x=200:y=1750:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         const ffmpeg = spawn(ffmpegPath, [
+            '-f', 'mp4',  // Force input format
             '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
-            '-i', 'pipe:3',              // Video stream input
+            '-r', '45',
+            //'-thread_queue_size', '1024', // Increase thread queue for audio input
+            //'-i', 'pipe:3',              // Video stream input
+            '-i', tempVideoPath,         // Use the file instead of pipe:3
             '-thread_queue_size', '1024', // Increase thread queue for audio input
             '-i', 'pipe:4',              // Audio input
             '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${wordGenerationLines}`, // Text overlay
@@ -469,15 +475,6 @@ async function processSixQuestionQuiz(req, res) {
                 'pipe',                   // video input
                 'pipe'                    // audio input
             ]
-        });
-
-        // Pipe video and audio streams into FFmpeg
-        videoStream.pipe(ffmpeg.stdio[3]).on('error', (err) => {
-            if (err.code === 'EPIPE') {
-                console.warn('Video stream ended unexpectedly (EPIPE)');
-            } else {
-                console.error('Error in video stream:', err);
-            }
         });
 
         finalStream.pipe(ffmpeg.stdio[4]).on('error', (err) => {
@@ -528,6 +525,10 @@ async function processSixQuestionQuiz(req, res) {
                     // Cleanup temporary files after sending response
                     fs.unlink(outputFilePath, (err) => {
                         if (err) console.error('Error removing temporary output file:', err);
+                    });
+                    // Cleanup temporary files after sending response
+                    fs.unlink(tempVideoPath, (err) => {
+                        if (err) console.error('Error removing temporary video file:', err);
                     });
                 });
             });
