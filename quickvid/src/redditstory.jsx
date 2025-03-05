@@ -51,7 +51,6 @@ const redditStory = () => {
     const [videoStartTime, setVideoStartTime] = useState('');
     const [VideoTitle, setVideoTitle] = useState('');
     const [VideoText, setVideoText] = useState(''); // Updated variable name for user input
-    const [VideoOutro, setVideoOutro] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
@@ -83,10 +82,6 @@ const redditStory = () => {
             alert('Please enter a valid video title');
             return;
         }
-        if (!VideoOutro) {
-            alert('Please enter a valid video outro');
-            return;
-        }
         setIsDownloading(true);
         progressBarFunction()
 
@@ -103,7 +98,6 @@ const redditStory = () => {
                     videoStartTime,
                     VideoTitle,
                     VideoText,
-                    VideoOutro
                 })
             });
 
@@ -137,7 +131,7 @@ const redditStory = () => {
         setShowProgress(true);
 
         const interval = setInterval(() => {
-            progress += (progress < 0.7 ? 0.004 : (progress < 0.8 ? 0.003 : 0.001));
+            progress += (progress < 0.7 ? 0.0035 : (progress < 0.8 ? 0.003 : 0.001));
             setProgressValue(progress);
 
             if (progress >= 1) {
@@ -197,13 +191,13 @@ const redditStory = () => {
                 onChange={(e) => setVideoText(e.target.value)}
                 placeholder="Enter Reddit Story Text"
                 className="text-input" />
-            <h2 className="QATitles">Set the video outro</h2>
-            <input
-                type="text"
-                value={VideoOutro}
-                onChange={(e) => setVideoOutro(e.target.value)}
-                placeholder="Enter Video Outro"
-                className="text-input" />
+            {/*<h2 className="QATitles">Set the video outro</h2>*/}
+            {/*<input*/}
+            {/*    type="text"*/}
+            {/*    value={VideoOutro}*/}
+            {/*    onChange={(e) => setVideoOutro(e.target.value)}*/}
+            {/*    placeholder="Enter Video Outro"*/}
+            {/*    className="text-input" />*/}
             <h2 className="QATitles" disabled={videoBtnSet} >Set the video outro</h2>
             <button
                 onClick={handleDownload}
