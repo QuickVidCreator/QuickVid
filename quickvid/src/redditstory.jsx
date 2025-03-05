@@ -107,7 +107,7 @@ const redditStory = () => {
                     videoUrl,
                     videoStartTime,
                     VideoTitle,
-                    VideoHook,
+                    //VideoHook,
                     VideoText,
                     VideoOutro
                 })
@@ -182,13 +182,13 @@ const redditStory = () => {
                 min="0"
                 className="num-input" />
             <h2 className="QATitles">Set the video title</h2>
-            <input
-                type="text"
-                value={VideoTitle}
-                onChange={(e) => setVideoTitle(e.target.value)}
-                placeholder="Enter Video Title"
-                className="text-input" />
-            <h2 className="QATitles">Set the video hook</h2>
+            {/*<input*/}
+            {/*    type="text"*/}
+            {/*    value={VideoTitle}*/}
+            {/*    onChange={(e) => setVideoTitle(e.target.value)}*/}
+            {/*    placeholder="Enter Video Title"*/}
+            {/*    className="text-input" />*/}
+            {/*<h2 className="QATitles">Set the video hook</h2>*/}
             <input
                 type="text"
                 value={VideoHook}

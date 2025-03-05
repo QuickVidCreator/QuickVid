@@ -81,7 +81,7 @@ async function processRedditStory(req, res) {
         videoUrl,
         videoStartTime,
         VideoTitle,
-        VideoHook,
+        //VideoHook,
         VideoText,
         VideoOutro
     } = req.body;
@@ -168,7 +168,6 @@ async function processRedditStory(req, res) {
         //'-map', '1:a',
         '-t', '60',                  // Set video duration to 60 seconds
         '-f', 'mp4',                 // Output format
-        '-movflags', 'frag_keyframe+empty_moov', // Add this line
         '-max_muxing_queue_size', '4096', // Increase muxing queue size
         outputFilePath               // Write to the temporary file
     ], {
