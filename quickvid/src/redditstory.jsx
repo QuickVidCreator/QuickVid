@@ -49,8 +49,7 @@ const updateVideoLimit = async (userId) => {
 const redditStory = () => {
     const [videoUrl, setVideoUrl] = useState('');
     const [videoStartTime, setVideoStartTime] = useState('');
-    //const [VideoTitle, setVideoTitle] = useState('');
-    const [VideoHook, setVideoHook] = useState('');
+    const [VideoTitle, setVideoTitle] = useState('');
     const [VideoText, setVideoText] = useState(''); // Updated variable name for user input
     const [VideoOutro, setVideoOutro] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
@@ -84,10 +83,6 @@ const redditStory = () => {
             alert('Please enter a valid video title');
             return;
         }
-        if (!VideoHook) {
-            alert('Please enter a valid video title');
-            return;
-        }
         if (!VideoOutro) {
             alert('Please enter a valid video outro');
             return;
@@ -107,7 +102,6 @@ const redditStory = () => {
                     videoUrl,
                     videoStartTime,
                     VideoTitle,
-                    //VideoHook,
                     VideoText,
                     VideoOutro
                 })
@@ -182,20 +176,20 @@ const redditStory = () => {
                 min="0"
                 className="num-input" />
             <h2 className="QATitles">Set the video title</h2>
-            {/*<input*/}
-            {/*    type="text"*/}
-            {/*    value={VideoTitle}*/}
-            {/*    onChange={(e) => setVideoTitle(e.target.value)}*/}
-            {/*    placeholder="Enter Video Title"*/}
-            {/*    className="text-input" />*/}
-            {/*<h2 className="QATitles">Set the video hook</h2>*/}
             <input
                 type="text"
-                value={VideoHook}
-                onChange={(e) => setVideoHook(e.target.value)}
-                placeholder="Enter Video Hook"
+                value={VideoTitle}
+                onChange={(e) => setVideoTitle(e.target.value)}
+                placeholder="Enter Video Title"
                 className="text-input" />
-            <br />
+            {/*<h2 className="QATitles">Set the video hook</h2>*/}
+            {/*<input*/}
+            {/*    type="text"*/}
+            {/*    value={VideoHook}*/}
+            {/*    onChange={(e) => setVideoHook(e.target.value)}*/}
+            {/*    placeholder="Enter Video Hook"*/}
+            {/*    className="text-input" />*/}
+            {/*<br />*/}
             <h2 className="QATitles">Set the reddit story text</h2>
             <input
                 type="text"
