@@ -49,7 +49,7 @@ const updateVideoLimit = async (userId) => {
 const redditStory = () => {
     const [videoUrl, setVideoUrl] = useState('');
     const [videoStartTime, setVideoStartTime] = useState('');
-    const [VideoTitle, setVideoTitle] = useState('');
+    //const [VideoTitle, setVideoTitle] = useState('');
     const [VideoHook, setVideoHook] = useState('');
     const [VideoText, setVideoText] = useState(''); // Updated variable name for user input
     const [VideoOutro, setVideoOutro] = useState('');
