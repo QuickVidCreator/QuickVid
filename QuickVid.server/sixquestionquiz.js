@@ -205,13 +205,27 @@ async function generateSpeech(VideoHook, Question1, Question1A, Question2, Quest
             //console.log(`Word: ${word}, Time: ${point.timeSeconds} seconds`);
         //});
         const timePoints = response.timepoints.map(point => point.timeSeconds);
+        // Adjust timepoints by detecting large time jumps (5s breaks)
+        const adjustedTimePoints = response.timepoints.map((point, index, array) => {
+            const nextPoint = array[index + 1]; // Look at the next timepoint
+
+            // If there's a gap of ~5s, subtract 5s from the last word before the gap
+            if (nextPoint && nextPoint.timeSeconds - point.timeSeconds >= 4.9) {
+                return { ...point, timeSeconds: Math.max(0, point.timeSeconds - 5) };
+            }
+
+            return point;
+        });
+
+        console.log(adjustedTimePoints);
+
         console.log(timePoints);
         const audioStream = new Readable({
             read() { }
         });
         audioStream.push(Buffer.from(response.audioContent));
         audioStream.push(null);
-        return { audioStream, timePoints };
+        return { audioStream, adjustedTimePoints };
 
     } catch (error) {
         console.error('TTS Error:', error);
@@ -377,7 +391,6 @@ async function processSixQuestionQuiz(req, res) {
         //const agent = ytdl.createProxyAgent({ uri: 'http://72.10.160.93:28593' });  // Replace with the desired proxy IP and port
         console.log("created proxy");
         //const info = await ytdl.getInfo(videoUrl, { agent });
-        const info = await ytdl.getInfo(videoUrl);
         //console.log(info);
         console.log("post proxy");
 
