@@ -187,6 +187,7 @@ const redditStory = () => {
             <h2 className="QATitles">Set the reddit story text</h2>
             <textarea
                 type="text"
+                rows="6"
                 value={VideoText}
                 onChange={(e) => setVideoText(e.target.value)}
                 placeholder="Enter Reddit Story Text"
