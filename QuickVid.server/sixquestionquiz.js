@@ -80,21 +80,39 @@ const processQuestionsToWords = async (text) => {
 //let currentTime = 0;
 //let timeline = 0;
 const generateText = async (text, times) => {
-    let drawTextCommands = '';
-    const words = text.split(' '); // Split text into words
+    let words = text.split(' ');
+    let adjustedWords = [];
+    let adjustedTimes = [];
 
-    words.forEach((word, index) => {
-        if (index >= times.length) return; // Prevent out-of-bounds errors
+    let wordIndex = 0;
+    let lastEndTime = 0;
 
-        const startTime = times[index]; // Use directly since times[] is in seconds
-        const endTime = times[index + 1] ?? startTime + 1; // Use next time or add 1s for last word
+    for (let i = 0; i < times.length; i++) {
+        if (times[i] === "break") {
+            // Insert a space with a fixed duration
+            adjustedWords.push(" ");
+            adjustedTimes.push(lastEndTime); // Space starts immediately after the last word
+            lastEndTime += 5; // Space lasts for 5 seconds
+        } else {
+            if (wordIndex < words.length) {
+                adjustedWords.push(words[wordIndex]);
+                adjustedTimes.push(lastEndTime); // Start at the previous word’s end time
+                lastEndTime = times[i]; // End time is taken from the original input
+                wordIndex++;
+            }
+        }
+    }
 
-        console.log(`Word: ${word}, Start: ${startTime}, End: ${endTime}`);
+    // Generate the drawtext commands
+    let drawTextCommands = "";
+    adjustedWords.forEach((word, index) => {
+        const startTime = adjustedTimes[index];
+        const endTime = adjustedTimes[index + 1] ?? startTime + 1; // Default to +1 second
 
+        console.log(`Word: '${word}', Start: ${startTime}, End: ${endTime}`);
         drawTextCommands += `drawtext=text='${word}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=100:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime},${endTime})',`;
     });
 
-    // Remove trailing comma
     return drawTextCommands.slice(0, -1);
 };
 
@@ -200,32 +218,50 @@ async function generateSpeech(VideoHook, Question1, Question1A, Question2, Quest
 
         // Print timepoints with words
         //response.timepoints.forEach(point => {
-            //const wordIndex = point.markName.split('_')[1];
-            //const word = text.split(' ')[wordIndex];
-            //console.log(`Word: ${word}, Time: ${point.timeSeconds} seconds`);
+        //const wordIndex = point.markName.split('_')[1];
+        //const word = text.split(' ')[wordIndex];
+        //console.log(`Word: ${word}, Time: ${point.timeSeconds} seconds`);
         //});
-        const timePoints = response.timepoints.map(point => point.timeSeconds);
+        const newtimePoints = response.timepoints.map(point => point.timeSeconds);
         // Adjust timepoints by detecting large time jumps (5s breaks)
-        const adjustedTimePoints = response.timepoints.map((point, index, array) => {
-            const nextPoint = array[index + 1]; // Look at the next timepoint
+        // Process timepoints to handle breaks correctly
+        const timePoints = [];
+        for (let i = 0; i < newtimePoints.length; i++) {
+            const currentTime = newtimePoints[i];
 
-            // If there's a gap of ~5s, subtract 5s from the last word before the gap
-            if (nextPoint && nextPoint.timeSeconds - point.timeSeconds >= 4.9) {
-                return { ...point, timeSeconds: Math.max(0, point.timeSeconds - 5) };
+            // Skip first point processing
+            if (i === 0) {
+                timePoints.push(currentTime);
+                continue;
             }
 
-            return point;
-        });
+            const prevTime = newtimePoints[i - 1];
 
-        console.log(adjustedTimePoints);
+            // Check if there's a large gap (potential break)
+            if (currentTime - prevTime >= 4.9 && currentTime - prevTime <= 10) {
+                // Add the last timepoint before the break without adjustment
+                //timePoints.push(currentTime-5);
 
-        console.log(timePoints);
+                // Add a marker for the break
+                timePoints.push("break");
+
+                // Add the current time normally
+                timePoints.push(currentTime);
+            } else {
+                // No break, add the current time normally
+                timePoints.push(currentTime);
+            }
+        }
+
+        console.log("New: " + timePoints);
+
+        console.log("OLD: " + newtimePoints);
         const audioStream = new Readable({
             read() { }
         });
         audioStream.push(Buffer.from(response.audioContent));
         audioStream.push(null);
-        return { audioStream, adjustedTimePoints };
+        return { audioStream, timePoints };
 
     } catch (error) {
         console.error('TTS Error:', error);

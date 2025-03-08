@@ -185,7 +185,7 @@ const redditStory = () => {
             {/*    className="text-input" />*/}
             {/*<br />*/}
             <h2 className="QATitles">Set the reddit story text</h2>
-            <input
+            <textarea
                 type="text"
                 value={VideoText}
                 onChange={(e) => setVideoText(e.target.value)}
