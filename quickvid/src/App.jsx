@@ -1,18 +1,44 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react'; // Added useState & useEffect
 import './App.css';
 import NormalQuiz from './NormalQuiz';
 import RedditStory from './redditstory'; // Make sure you import the RedditStory component
 
 const App = () => {
+    const [userData, setUserData] = useState(null);
+
+    useEffect(() => {
+        const handleMessage = (event) => {
+            if (event.origin !== "https://quick-vid.com") return;
+
+            if (event.data && event.data.username) {
+                setUserData(event.data);
+                console.log("Received user data:", event.data);
+            }
+        };
+
+        window.addEventListener("message", handleMessage);
+
+        return () => {
+            window.removeEventListener("message", handleMessage);
+        };
+    }, []);
 
     return (
         <Router>
             <div className="App">
+                <h1>QuickVid App</h1>
+                {userData ? (
+                    <p>Welcome, {userData.username} (ID: {userData.id})</p>
+                ) : (
+                    <p>Loading user data...</p>
+                )}
+
                 <Routes>
                     <Route
                         path="/"
                         element={
-                            <div className="ButtonsClass"> {/* Removed Link wrapper, will use individual Links */}
+                            <div className="ButtonsClass">
                                 <Link to="/sixquestionquiz">
                                     <button className="OptionsBtns">
                                         <span className="OptionsBtnsTitle">6 Question Quiz</span>
@@ -49,4 +75,5 @@ const App = () => {
         </Router>
     );
 };
+
 export default App;
