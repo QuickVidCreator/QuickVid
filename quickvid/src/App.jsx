@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+﻿import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react'; // Added useState & useEffect
 import './App.css';
 import NormalQuiz from './NormalQuiz';
@@ -6,6 +6,9 @@ import RedditStory from './redditstory'; // Make sure you import the RedditStory
 
 const App = () => {
     const [userData, setUserData] = useState(null);
+    window.addEventListener("message", (event) => {
+        console.log("✅ Received message:", event.data);
+    });
     useEffect(() => {
         const handleMessage = (event) => {
             console.log("Message received from:", event.origin);
@@ -22,7 +25,7 @@ const App = () => {
 
             if (event.data && event.data.username) {
                 setUserData(event.data);
-                console.log("? Received user data:", event.data);
+                console.log("✅ Received user data:", event.data);
 
                 // Also send confirmation back to WordPress
                 window.parent.postMessage(
