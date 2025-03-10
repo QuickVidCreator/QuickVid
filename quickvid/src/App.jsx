@@ -4,6 +4,22 @@ import './App.css';
 import NormalQuiz from './NormalQuiz';
 import RedditStory from './redditstory'; // Make sure you import the RedditStory component
 
+const getVideoLimit = async (userId) => {
+    try {
+        const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+        });
+        const data = await response.json();
+        console.log('Current video count:', data.videoCount); // Debug log
+        return data.videoCount;
+    } catch (error) {
+        console.error('Error:', error);
+        return null;
+    }
+};
+
 const App = () => {
     const [userData, setUserData] = useState(null);
     useEffect(() => {
@@ -39,7 +55,7 @@ const App = () => {
             window.removeEventListener("message", handleMessage);
         };
     }, []);
-
+    const limit = getVideoLimit(userData.id);
     return (
         <Router>
             <div className="App">
@@ -49,7 +65,7 @@ const App = () => {
                 ) : (
                     <p>Loading user data...</p>
                 )}
-
+                <h1>Daily Videos Left: {limit}</h1>
                 <Routes>
                     <Route
                         path="/"
