@@ -7,6 +7,7 @@ import RedditStory from './redditstory'; // Make sure you import the RedditStory
 const App = () => {
     const [userData, setUserData] = useState(null);
     useEffect(() => {
+        console.log("Setting up message listener...");
         const handleMessage = (event) => {
             console.log("Message received from:", event.origin);
             console.log("Message data:", event.data);
