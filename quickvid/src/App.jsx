@@ -11,12 +11,24 @@ const App = () => {
             console.log("Message received from:", event.origin);
             console.log("Message data:", event.data);
 
+            // Send log back to the parent (WordPress) for debugging
+            window.parent.postMessage(
+                { log: "Message received", origin: event.origin, data: event.data },
+                "*"
+            );
+
             // Ensure we only accept messages from the WordPress site
             if (event.origin !== "https://quick-vid.com") return;
 
             if (event.data && event.data.username) {
                 setUserData(event.data);
                 console.log("? Received user data:", event.data);
+
+                // Also send confirmation back to WordPress
+                window.parent.postMessage(
+                    { log: "User data set successfully", data: event.data },
+                    "*"
+                );
             }
         };
 
