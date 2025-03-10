@@ -1,4 +1,4 @@
-const getVideoLimit = async (userId) => {
+export const getVideoLimit = async (userId) => {
     try {
         const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {
             method: 'GET',
