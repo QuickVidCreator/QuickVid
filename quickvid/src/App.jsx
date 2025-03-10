@@ -9,11 +9,15 @@ const App = () => {
 
     useEffect(() => {
         const handleMessage = (event) => {
+            console.log("Message received from:", event.origin);
+            console.log("Message data:", event.data);
+
+            // Ensure we only accept messages from the WordPress site
             if (event.origin !== "https://quick-vid.com") return;
 
             if (event.data && event.data.username) {
                 setUserData(event.data);
-                console.log("Received user data:", event.data);
+                console.log("? Received user data:", event.data);
             }
         };
 
