@@ -22,6 +22,7 @@ const getVideoLimit = async (userId) => {
 
 const App = () => {
     const [userData, setUserData] = useState(null);
+    const [videoLimit, setVideoLimit] = useState(null);
     useEffect(() => {
         console.log("Setting up message listener...");
         const handleMessage = (event) => {
@@ -55,7 +56,13 @@ const App = () => {
             window.removeEventListener("message", handleMessage);
         };
     }, []);
-    const limit = getVideoLimit(userData.id);
+    const fetchVideoLimit = async () => {
+        const limit = await getVideoLimit(userData.id);
+        console.log("Fetched video count:", limit);
+        setVideoLimit(limit);
+    };
+    fetchVideoLimit();
+
     return (
         <Router>
             <div className="App">
@@ -65,7 +72,7 @@ const App = () => {
                 ) : (
                     <p>Loading user data...</p>
                 )}
-                <h1>Daily Videos Left: {limit}</h1>
+                <h1>Daily Videos Left: {videoLimit}</h1>
                 <Routes>
                     <Route
                         path="/"
