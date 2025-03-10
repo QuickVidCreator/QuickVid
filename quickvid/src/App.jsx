@@ -18,7 +18,7 @@ const App = () => {
             );
 
             // Ensure we only accept messages from the WordPress site
-            if (event.origin !== "https://quick-vid.com") return;
+            //if (event.origin !== "https://quick-vid.com") return;
 
             if (event.data && event.data.username) {
                 setUserData(event.data);
