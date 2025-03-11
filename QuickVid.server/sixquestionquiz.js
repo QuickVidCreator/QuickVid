@@ -117,12 +117,13 @@ const generateText = async (text, times) => {
 };
 
 
-const generateAnswers = (text, times) => {
+const generateAnswers = (text, times, location) => {
     let drawTextCommands = '';
     let startTime = times[0];
+    let answerLocationY = location;
     drawTextCommands += `drawtext=text='${text}':x=${answerLocationX}:y=${answerLocationY}:fontsize=70:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime}, 65)',`;
 
-    answerLocationY += 150;
+    //answerLocationY += 140;
     // Remove the trailing comma
     return drawTextCommands.trim().slice(0, -1);
 };
@@ -275,7 +276,7 @@ async function processSixQuestionQuiz(req, res) {
     currentTime = 0;
     timeline = 0;
     answerLocationX = 200;
-    answerLocationY = 1005;
+    answerLocationY = 1010;
     //const videoUrl = req.query.url;
     //const videoStartTime = req.query.VideoStartTime;
     //const VideoTitle = req.query.VideoTitle;
@@ -329,7 +330,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion1ACount(Question1A);
         const Question1ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
-        const AnswerOneText = generateAnswers(Question1A, Question1ATiming);
+        const AnswerOneText = generateAnswers(Question1A, Question1ATiming, 1000);
         console.log(AnswerOneText);
         //QUESTION TWO TIMING
         const getQuestion2Count = (Question2) => {
@@ -345,7 +346,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion2ACount(Question2A);
         const Question2ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
-        const AnswerTwoText = generateAnswers(Question2A, Question2ATiming);
+        const AnswerTwoText = generateAnswers(Question2A, Question2ATiming, 1150);
         //QUESTION THREE TIMING
         const getQuestion3Count = (Question3) => {
             return Question3.split(' ').length;
@@ -360,7 +361,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion3ACount(Question3A);
         const Question3ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
-        const AnswerThreeText = generateAnswers(Question3A, Question3ATiming);
+        const AnswerThreeText = generateAnswers(Question3A, Question3ATiming, 1300);
         //QUESTION FOUR TIMING
         const getQuestion4Count = (Question4) => {
             return Question4.split(' ').length;
@@ -375,7 +376,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion4ACount(Question4A);
         const Question4ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
-        const AnswerFourText = generateAnswers(Question4A, Question4ATiming);
+        const AnswerFourText = generateAnswers(Question4A, Question4ATiming, 1450);
         //QUESTION FIVE TIMING
         const getQuestion5Count = (Question5) => {
             return Question5.split(' ').length;
@@ -390,7 +391,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion5ACount(Question5A);
         const Question5ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
-        const AnswerFiveText = generateAnswers(Question5A, Question5ATiming);
+        const AnswerFiveText = generateAnswers(Question5A, Question5ATiming, 1600);
         //QUESTION SIX TIMING
         const getQuestion6Count = (Question6) => {
             return Question6.split(' ').length;
@@ -405,7 +406,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion6ACount(Question6A);
         const Question6ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
-        const AnswerSixText = generateAnswers(Question6A, Question6ATiming);
+        const AnswerSixText = generateAnswers(Question6A, Question6ATiming, 1750);
 
         // Convert the audio stream to a buffer
         //const audioBuffer = await streamToBuffer(audioStream2);
