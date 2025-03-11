@@ -5,10 +5,10 @@ import NormalQuiz from './NormalQuiz';
 import RedditStory from './redditstory'; // Make sure you import the RedditStory component
 import { getVideoLimit } from './Functions/userInfo.js';  // Adjust the path based on your project structure
 import { setUserData } from './Functions/userInfo.js';
-import { userData } from './Functions/userInfo.js';
+//import { userData } from './Functions/userInfo.js';
 
 const App = () => {
-    //const [userData, setUserData] = useState(null);
+    const [userDataTemp, setUserDataTemp] = useState(null);
     const [videoLimit, setVideoLimit] = useState(null);
     useEffect(() => {
         console.log("Setting up message listener...");
@@ -26,7 +26,7 @@ const App = () => {
             //if (event.origin !== "https://quick-vid.com") return;
 
             if (event.data && event.data.username) {
-                setUserData(event.data);
+                setUserDataTemp(event.data);
                 console.log("✅ Received user data:", event.data);
 
                 // Also send confirmation back to WordPress
@@ -43,8 +43,9 @@ const App = () => {
             window.removeEventListener("message", handleMessage);
         };
     }, []);
+    setUserData(userDataTemp);
     const fetchVideoLimit = async () => {
-        const limit = await getVideoLimit(userData.id);
+        const limit = await getVideoLimit(userDataTemp.id);
         console.log("Fetched video count:", limit);
         setVideoLimit(limit);
     };
@@ -54,8 +55,8 @@ const App = () => {
         <Router>
             <div className="App">
                 <h1>QuickVid App</h1>
-                {userData ? (
-                    <p>Welcome, {userData.username} (ID: {userData.id})</p>
+                {userDataTemp ? (
+                    <p>Welcome, {userDataTemp.username} (ID: {userDataTemp.id})</p>
                 ) : (
                     <p>Loading user data...</p>
                 )}
