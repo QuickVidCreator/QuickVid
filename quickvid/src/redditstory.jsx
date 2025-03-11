@@ -28,6 +28,9 @@ const redditStory = () => {
             const limit = await getVideoLimit();
             console.log("Fetched video count:", limit);
             setVideoLimit(limit);
+            if (limit == 0) {
+                videoBtnSet = false;
+            }
         };
 
         fetchVideoLimit();
