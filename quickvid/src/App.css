@@ -17,6 +17,18 @@
     min-width: 700px;
     box-sizing: border-box;
 }
+.UserInfo {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    color: white; /* Make text readable */
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: right;
+}
+
 .ButtonsClass {
     display: flex;
     align-items: center;

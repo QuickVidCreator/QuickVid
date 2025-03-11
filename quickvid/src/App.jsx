@@ -54,12 +54,14 @@ const App = () => {
     return (
         <Router>
             <div className="App">
-                {userDataTemp ? (
-                    <p>Welcome, {userDataTemp.username} (ID: {userDataTemp.id})</p>
-                ) : (
-                    <p>Loading user data...</p>
-                )}
-                <p>Daily Videos Left: {videoLimit}</p>
+                <div className="UserInfo">
+                    {userDataTemp ? (
+                        <p>Welcome, {userDataTemp.username} (ID: {userDataTemp.id})</p>
+                    ) : (
+                        <p>Loading user data...</p>
+                    )}
+                        <p>Daily Videos Left: {videoLimit}</p>
+                </div>
                 <Routes>
                     <Route
                         path="/"
