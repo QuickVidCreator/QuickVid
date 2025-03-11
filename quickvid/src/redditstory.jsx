@@ -3,23 +3,11 @@ import { useState, useEffect } from 'react';
 
 import './redditstory.css'; // Import the CSS file
 import './global.css';
+import { getVideoLimit } from './Functions/userInfo.js';
+import { userData } from './Functions/userInfo.js';
+
 
 let videoBtnSet = true;
-const getVideoLimit = async (userId) => {
-    try {
-        const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-        });
-        const data = await response.json();
-        console.log('Current video count:', data.videoCount); // Debug log
-        return data.videoCount;
-    } catch (error) {
-        console.error('Error:', error);
-        return null;
-    }
-};
 
 const updateVideoLimit = async (userId) => {
     try {
@@ -56,11 +44,11 @@ const redditStory = () => {
     const [progressValue, setProgressValue] = useState(false);
 
     const [videoLimit, setVideoLimit] = useState(null);
-    const userId = 2; // Replace with dynamic user ID if needed
+    //const userId = 2; // Replace with dynamic user ID if needed
 
     useEffect(() => {
         const fetchVideoLimit = async () => {
-            const limit = await getVideoLimit(userId);
+            const limit = await getVideoLimit();
             console.log("Fetched video count:", limit);
             setVideoLimit(limit);
         };
