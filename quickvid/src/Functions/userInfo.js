@@ -1,3 +1,9 @@
+export let userData = null;
+
+export const setUserData = (data) => {
+    userData = data;
+};
+
 export const getVideoLimit = async (userId) => {
     try {
         const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {

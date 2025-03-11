@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react'; // Added useState & useEffect
 import './App.css';
 import NormalQuiz from './NormalQuiz';
 import RedditStory from './redditstory'; // Make sure you import the RedditStory component
-import { getVideoLimit } from './Functions/videoUtils.js';  // Adjust the path based on your project structure
-
+import { getVideoLimit } from './Functions/userInfo.js';  // Adjust the path based on your project structure
+import { setUserData } from './Functions/userInfo.js';
+import { userData } from './Functions/userInfo.js';
 
 const App = () => {
-    const [userData, setUserData] = useState(null);
+    //const [userData, setUserData] = useState(null);
     const [videoLimit, setVideoLimit] = useState(null);
     useEffect(() => {
         console.log("Setting up message listener...");
