@@ -117,9 +117,9 @@ const generateText = async (text, times) => {
 };
 
 
-const generateAnswers = async (text, times) => {
+const generateAnswers = (text, times) => {
     let drawTextCommands = '';
-
+    let startTime = times[0];
     drawTextCommands += `drawtext=text='${text}':x=${answerLocationX}:y=${answerLocationY}:fontsize=70:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime}, 65)',`;
 
     answerLocationY += 150;
@@ -306,6 +306,7 @@ async function processSixQuestionQuiz(req, res) {
         const wordGenerationLines = await generateText(FullSpeech, timePoints);
         console.log(wordGenerationLines);
 
+        const cleantimePoints = timePoints.filter(point => point !== "break");
         //VIDEO HOOK TIMING
         const getVideoHookCount = (VideoHook) => {
             return VideoHook.split(' ').length;
@@ -313,92 +314,93 @@ async function processSixQuestionQuiz(req, res) {
         let timeTrack = 0;
         let timeTrackOld = 0;
         timeTrack += getVideoHookCount(VideoHook);
-        const VideoHookTiming = timePoints.slice(0, timeTrack);
+        const VideoHookTiming = cleantimePoints.slice(0, timeTrack);
         //QUESTION ONE TIMING
         const getQuestion1Count = (Question1) => {
             return Question1.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion1Count(Question1);
-        const Question1Timing = timePoints.slice(timeTrackOld, timeTrack);
+        const Question1Timing = cleantimePoints.slice(timeTrackOld, timeTrack);
         //QUESTION ONE ANSWER TIMING
         const getQuestion1ACount = (Question1A) => {
             return Question1A.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion1ACount(Question1A);
-        const Question1ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        const Question1ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
         const AnswerOneText = generateAnswers(Question1A, Question1ATiming);
+        console.log(AnswerOneText);
         //QUESTION TWO TIMING
         const getQuestion2Count = (Question2) => {
             return Question2.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion2Count(Question2);
-        const Question2Timing = timePoints.slice(timeTrackOld, timeTrack);
+        const Question2Timing = cleantimePoints.slice(timeTrackOld, timeTrack);
         //QUESTION TWO ANSWER TIMING
         const getQuestion2ACount = (Question2A) => {
             return Question2A.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion2ACount(Question2A);
-        const Question2ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        const Question2ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
         //QUESTION THREE TIMING
         const getQuestion3Count = (Question3) => {
             return Question3.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion3Count(Question3);
-        const Question3Timing = timePoints.slice(timeTrackOld, timeTrack);
+        const Question3Timing = cleantimePoints.slice(timeTrackOld, timeTrack);
         //QUESTION THREE ANSWER TIMING
         const getQuestion3ACount = (Question3A) => {
             return Question3A.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion3ACount(Question3A);
-        const Question3ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        const Question3ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
         //QUESTION FOUR TIMING
         const getQuestion4Count = (Question4) => {
             return Question4.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion4Count(Question4);
-        const Question4Timing = timePoints.slice(timeTrackOld, timeTrack);
+        const Question4Timing = cleantimePoints.slice(timeTrackOld, timeTrack);
         //QUESTION FOUR ANSWER TIMING
         const getQuestion4ACount = (Question4A) => {
             return Question4A.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion4ACount(Question4A);
-        const Question4ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        const Question4ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
         //QUESTION FIVE TIMING
         const getQuestion5Count = (Question5) => {
             return Question5.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion5Count(Question5);
-        const Question5Timing = timePoints.slice(timeTrackOld, timeTrack);
+        const Question5Timing = cleantimePoints.slice(timeTrackOld, timeTrack);
         //QUESTION FIVE ANSWER TIMING
         const getQuestion5ACount = (Question5A) => {
             return Question5A.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion5ACount(Question5A);
-        const Question5ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        const Question5ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
         //QUESTION SIX TIMING
         const getQuestion6Count = (Question6) => {
             return Question6.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion6Count(Question6);
-        const Question6Timing = timePoints.slice(timeTrackOld, timeTrack);
+        const Question6Timing = cleantimePoints.slice(timeTrackOld, timeTrack);
         //QUESTION SIX ANSWER TIMING
         const getQuestion6ACount = (Question6A) => {
             return Question6A.split(' ').length;
         };
         timeTrackOld = timeTrack;
         timeTrack += getQuestion6ACount(Question6A);
-        const Question6ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        const Question6ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
 
         // Convert the audio stream to a buffer
         //const audioBuffer = await streamToBuffer(audioStream2);
