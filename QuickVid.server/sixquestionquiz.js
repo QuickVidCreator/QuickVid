@@ -330,7 +330,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion1ACount(Question1A);
         const Question1ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
-        const AnswerOneText = generateAnswers(Question1A, Question1ATiming, 1000);
+        const AnswerOneText = generateAnswers(Question1A, Question1ATiming, 1010);
         console.log(AnswerOneText);
         //QUESTION TWO TIMING
         const getQuestion2Count = (Question2) => {
@@ -361,7 +361,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion3ACount(Question3A);
         const Question3ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
-        const AnswerThreeText = generateAnswers(Question3A, Question3ATiming, 1300);
+        const AnswerThreeText = generateAnswers(Question3A, Question3ATiming, 1295);
         //QUESTION FOUR TIMING
         const getQuestion4Count = (Question4) => {
             return Question4.split(' ').length;
@@ -391,7 +391,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion5ACount(Question5A);
         const Question5ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
-        const AnswerFiveText = generateAnswers(Question5A, Question5ATiming, 1600);
+        const AnswerFiveText = generateAnswers(Question5A, Question5ATiming, 1595);
         //QUESTION SIX TIMING
         const getQuestion6Count = (Question6) => {
             return Question6.split(' ').length;
@@ -406,7 +406,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion6ACount(Question6A);
         const Question6ATiming = cleantimePoints.slice(timeTrackOld, timeTrack);
-        const AnswerSixText = generateAnswers(Question6A, Question6ATiming, 1750);
+        const AnswerSixText = generateAnswers(Question6A, Question6ATiming, 1745);
 
         // Convert the audio stream to a buffer
         //const audioBuffer = await streamToBuffer(audioStream2);
@@ -501,7 +501,7 @@ async function processSixQuestionQuiz(req, res) {
             '-i', tempVideoPath,         // Use the file instead of pipe:3
             '-thread_queue_size', '1024', // Increase thread queue for audio input
             '-i', 'pipe:4',              // Audio input
-            '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${wordGenerationLines},${QuestionNum1},${QuestionNum2},${QuestionNum3},${QuestionNum4},${QuestionNum5},${QuestionNum6},${AnswerOneText},${AnswerTwoText},${AnswerThreeText},${AnswerFourText},${AnswerFiveText},${AnswerSixText}`, // Text overlay
+            '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${VideoTitleSet},${wordGenerationLines},${QuestionNum1},${QuestionNum2},${QuestionNum3},${QuestionNum4},${QuestionNum5},${QuestionNum6},${AnswerOneText},${AnswerTwoText},${AnswerThreeText},${AnswerFourText},${AnswerFiveText},${AnswerSixText}`, // Text overlay
             '-c:v', 'libx264',           // Video codec (H.264)
             '-c:a', 'aac',               // Audio codec (AAC)
             '-preset', 'ultrafast',       // Use ultrafast encoding preset
