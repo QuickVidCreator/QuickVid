@@ -117,27 +117,11 @@ const generateText = async (text, times) => {
 };
 
 
-const generateAnswers = async (text) => {
+const generateAnswers = async (text, times) => {
     let drawTextCommands = '';
 
-    currentTime = timeline;
-    // Display the full version of the answer at the start
-    const startTime = currentTime / 1000; // Convert ms to seconds
-    //drawTextCommands += `drawtext=text='${text}':x=${answerLocationX}:y=${answerLocationY}:fontsize=70:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime}, ${startTime + (60 - startTime)})',`;
     drawTextCommands += `drawtext=text='${text}':x=${answerLocationX}:y=${answerLocationY}:fontsize=70:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime}, 65)',`;
 
-
-    // Loop through each word and display them one by one
-    for (const { word, duration } of durations) {
-        const wordStartTime = currentTime / 1000; // Convert ms to seconds
-        const wordEndTime = (currentTime + duration) / 1000; // Convert ms to seconds
-
-        console.log("Word: " + word + " | Start: " + wordStartTime + " | End: " + wordEndTime);
-
-        drawTextCommands += `drawtext=text='${word}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=100:fontcolor=white:fontfile='${fontPath}':enable='between(t,${wordStartTime},${wordEndTime})',`;
-
-        currentTime += duration; // Update cumulative time after processing each word
-    }
     answerLocationY += 150;
     // Remove the trailing comma
     return drawTextCommands.trim().slice(0, -1);
@@ -321,6 +305,7 @@ async function processSixQuestionQuiz(req, res) {
         console.log(FullSpeech);
         const wordGenerationLines = await generateText(FullSpeech, timePoints);
         console.log(wordGenerationLines);
+
         //VIDEO HOOK TIMING
         const getVideoHookCount = (VideoHook) => {
             return VideoHook.split(' ').length;
@@ -343,6 +328,7 @@ async function processSixQuestionQuiz(req, res) {
         timeTrackOld = timeTrack;
         timeTrack += getQuestion1ACount(Question1A);
         const Question1ATiming = timePoints.slice(timeTrackOld, timeTrack);
+        const AnswerOneText = generateAnswers(Question1A, Question1ATiming);
         //QUESTION TWO TIMING
         const getQuestion2Count = (Question2) => {
             return Question2.split(' ').length;
@@ -492,7 +478,7 @@ async function processSixQuestionQuiz(req, res) {
         const QuestionNum4 = `drawtext=text='4)':x=100:y=1450:fontsize=70:fontcolor=white:fontfile='${fontPath}'`;
         const QuestionNum5 = `drawtext=text='5)':x=100:y=1600:fontsize=70:fontcolor=white:fontfile='${fontPath}'`;
         const QuestionNum6 = `drawtext=text='6)':x=100:y=1750:fontsize=70:fontcolor=white:fontfile='${fontPath}'`;
-        //const Question1Ans = `drawtext=text='${Question1A}':x=200:y=1000:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
+        const Question1Ans = `drawtext=text='${Question1A}':x=200:y=1000:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         //const Question2Ans = `drawtext=text='${Question2A}':x=200:y=1150:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         //const Question3Ans = `drawtext=text='${Question3A}':x=200:y=1300:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         //const Question4Ans = `drawtext=text='${Question4A}':x=200:y=1450:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
@@ -507,7 +493,7 @@ async function processSixQuestionQuiz(req, res) {
             '-i', tempVideoPath,         // Use the file instead of pipe:3
             '-thread_queue_size', '1024', // Increase thread queue for audio input
             '-i', 'pipe:4',              // Audio input
-            '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${wordGenerationLines}`, // Text overlay
+            '-vf', `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920:(in_w-1080)/2:(in_h-1920)/2,${wordGenerationLines},${Question1Ans},${AnswerOneText}`, // Text overlay
             '-c:v', 'libx264',           // Video codec (H.264)
             '-c:a', 'aac',               // Audio codec (AAC)
             '-preset', 'ultrafast',       // Use ultrafast encoding preset
