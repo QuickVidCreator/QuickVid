@@ -4,32 +4,9 @@ import { useState, useEffect } from 'react';
 import './redditstory.css'; // Import the CSS file
 import './global.css';
 import { getVideoLimit } from './Functions/userInfo.js';
-import { userData } from './Functions/userInfo.js';
-
+import { updateVideoLimit } from './Functions/userInfo.js';
 
 let videoBtnSet = true;
-
-const updateVideoLimit = async (userId) => {
-    try {
-        const response = await fetch(`https://quick-vid.com/wp-json/custom/v1/videoCount/${userId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-        });
-        const data = await response.json();
-
-        if (data.success) {
-            console.log('Videos remaining:', data.videoCount);
-            return data.videoCount;
-        } else {
-            console.error('Error updating count:', data.error);
-            return null;
-        }
-    } catch (error) {
-        console.error('Error updating video count:', error);
-        return null;
-    }
-};
 
 
 // Call the function to get the video limit
@@ -61,7 +38,7 @@ const redditStory = () => {
     }
 
     const handleDownload = async () => {
-        updateVideoLimit(2);
+        updateVideoLimit();
         if (!videoUrl) {
             alert('Please enter a valid YouTube URL');
             return;
