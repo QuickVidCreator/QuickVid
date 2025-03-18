@@ -12,6 +12,17 @@ const { PassThrough } = require('stream'); // Use require for consistency
 const { Readable } = require('stream'); // Use require for consistency
 const textToSpeech = require('@google-cloud/text-to-speech');
 const fsp = require('fs').promises;
+const logFile = fs.createWriteStream(`sixquestionquiz-output-${Date.now()}.log`, { flags: 'a' });
+
+console.log = function (message) {
+    logFile.write(`${new Date().toISOString()} - ${message}\n`);
+    process.stdout.write(`${message}\n`);
+};
+
+console.error = function (message) {
+    logFile.write(`${new Date().toISOString()} - ERROR: ${message}\n`);
+    process.stderr.write(`${message}\n`);
+};
 
 const mime = require('mime-types');
 const cors = require('cors');
@@ -432,7 +443,13 @@ async function processSixQuestionQuiz(req, res) {
             format = info.formats.find(format => format.qualityLabel === '1440p60' && format.container === 'mp4');
         }
         if (!format) {
-            const format = ytdl.chooseFormat(info.formats, {
+            format = info.formats.find(format => format.qualityLabel === '1080p' && format.container === 'mp4');
+        }
+        if (!format) {
+            format = info.formats.find(format => format.qualityLabel === '1440p' && format.container === 'mp4');
+        }
+        if (!format) {
+            format = ytdl.chooseFormat(info.formats, {
                 quality: 'highestvideo',
                 container: 'mp4'
             });

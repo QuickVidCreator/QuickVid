@@ -11,7 +11,7 @@ const getMP3Duration = require('get-mp3-duration'); // Added this import
 const { Readable } = require('stream'); // Use require for consistency
 const textToSpeech = require('@google-cloud/text-to-speech');
 const fsp = require('fs').promises;
-const logFile = fs.createWriteStream('output.log', { flags: 'a' });
+const logFile = fs.createWriteStream(`redditstory-output-${Date.now()}.log`, { flags: 'a' });
 
 console.log = function (message) {
     logFile.write(`${new Date().toISOString()} - ${message}\n`);
@@ -105,6 +105,9 @@ async function processRedditStory(req, res) {
     let format = info.formats.find(format => format.qualityLabel === '1080p60' && format.container === 'mp4');
     if (!format) {
         format = info.formats.find(format => format.qualityLabel === '1440p60' && format.container === 'mp4');
+    }
+    if (!format) {
+        format = info.formats.find(format => format.qualityLabel === '1440p' && format.container === 'mp4');
     }
     if (!format) {
         format = info.formats.find(format => format.qualityLabel === '1440p' && format.container === 'mp4');
