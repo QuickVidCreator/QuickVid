@@ -97,6 +97,7 @@ async function processRedditStory(req, res) {
     } = req.body;
     VideoText = VideoText.replace(/'/g, "");
     console.log("REDDIT STORY SUCCESS");
+    console.log(VideoText);
     //generateSpeech('Hello world, how are you today?')
     //.then(result => console.log(result.wordTimings));
     const { audioStream: RedditAudio, timePoints } = await generateSpeech(VideoText);
