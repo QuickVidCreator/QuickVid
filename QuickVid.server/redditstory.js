@@ -87,7 +87,7 @@ async function generateSpeech(text) {
     }
 }
 async function processRedditStory(req, res) {
-    const {
+    let {
         videoUrl,
         videoStartTime,
         VideoTitle,
@@ -95,7 +95,7 @@ async function processRedditStory(req, res) {
         VideoText,
         VideoOutro
     } = req.body;
-    VideoText = VideoText.replace(/'/g, "");
+    //VideoText = VideoText.replace(/'/g, "");
     console.log("REDDIT STORY SUCCESS");
     console.log(VideoText);
     //generateSpeech('Hello world, how are you today?')
@@ -162,6 +162,7 @@ async function processRedditStory(req, res) {
     const VideoTitleSet = `drawtext=text='${VideoTitle}':x=(w-text_w)/2:y=(h-text_h)/6:fontsize=100:fontcolor=white:fontfile='${fontPath}'`;
 
     const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
+    VideoText = VideoText.replace(/'/g, "''"); // Double up apostrophes
     const RedditText = generateText(VideoText, timePoints);
     console.log(RedditText);
     const ffmpeg = spawn(ffmpegPath, [
