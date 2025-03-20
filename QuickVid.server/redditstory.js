@@ -197,14 +197,6 @@ async function processRedditStory(req, res) {
             'pipe'                    // audio input
         ]
     });
-    const finalffmpeg = spawn(ffmpegPath, [
-        '-i', firstoutputFilePath,  // Read from stdin
-        '-vf', `drawtext=text='testing':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=100:fontcolor=white:fontfile='${fontPath}'`, // Text overlay
-        '-c:v', 'libx264',
-        '-c:a', 'aac',
-        '-preset', 'ultrafast',
-        outputFilePath
-    ]);
     // Pipe video and audio streams into FFmpeg
     //videoStream.pipe(ffmpeg.stdio[3]).on('error', (err) => {
     //if (err.code === 'EPIPE') {
@@ -221,55 +213,65 @@ async function processRedditStory(req, res) {
             console.error('Error in audio stream:', err);
         }
     });
+    ffmpeg.on('exit', (code) => {
+        console.log("NEXT PROCESS");
+        const finalffmpeg = spawn(ffmpegPath, [
+            '-i', firstoutputFilePath,  // Read from stdin
+            '-vf', `drawtext=text='testing':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=100:fontcolor=white:fontfile='${fontPath}'`, // Text overlay
+            '-c:v', 'libx264',
+            '-c:a', 'aac',
+            '-preset', 'ultrafast',
+            outputFilePath
+        ]);
+        // Ensure that FFmpeg knows the end of input streams is coming by explicitly ending the pipes
+        videoStream.on('end', () => {
+            ffmpeg.stdio[3].end(); // Close video input pipe
+        });
 
-    // Ensure that FFmpeg knows the end of input streams is coming by explicitly ending the pipes
-    videoStream.on('end', () => {
-        ffmpeg.stdio[3].end(); // Close video input pipe
-    });
+        RedditAudio.on('end', () => {
+            ffmpeg.stdio[4].end(); // Close audio input pipe
+        });
 
-    RedditAudio.on('end', () => {
-        ffmpeg.stdio[4].end(); // Close audio input pipe
-    });
+        // Handle stderr to log any errors
+        ffmpeg.stderr.on('data', (data) => {
+            console.error(`FFmpeg stderr: ${data}`);
+        });
 
-    // Handle stderr to log any errors
-    ffmpeg.stderr.on('data', (data) => {
-        console.error(`FFmpeg stderr: ${data}`);
-    });
+        // Handle errors during the FFmpeg process
+        ffmpeg.on('error', (err) => {
+            console.error('FFmpeg error:', err);
+        });
 
-    // Handle errors during the FFmpeg process
-    ffmpeg.on('error', (err) => {
-        console.error('FFmpeg error:', err);
-    });
+        // When FFmpeg finishes, handle sending the result to the client
+        finalffmpeg.on('close', (code) => {
+            console.log(`FFmpeg process closed with code ${code}`);
 
-    // When FFmpeg finishes, handle sending the result to the client
-    finalffmpeg.on('close', (code) => {
-        console.log(`FFmpeg process closed with code ${code}`);
-
-        // Attempt to send the video file to the client, even if FFmpeg failed
-        fs.stat(outputFilePath, (err, stats) => {
-            if (err || !stats.isFile()) {
-                console.error('Output file not found or inaccessible:', err);
-                return res.status(500).send('Failed to generate video.');
-            }
-
-            // Send the file if it exists
-            res.sendFile(outputFilePath, (err) => {
-                //res.download(outputFilePath, 'video.mp4', (err) => {
-                if (err) {
-                    console.error('Error sending file:', err);
+            // Attempt to send the video file to the client, even if FFmpeg failed
+            fs.stat(outputFilePath, (err, stats) => {
+                if (err || !stats.isFile()) {
+                    console.error('Output file not found or inaccessible:', err);
+                    return res.status(500).send('Failed to generate video.');
                 }
 
-                // Cleanup temporary files after sending response
-                fs.unlink(outputFilePath, (err) => {
-                    if (err) console.error('Error removing temporary output file:', err);
-                });
-                // Cleanup temporary files after sending response
-                fs.unlink(tempVideoPath, (err) => {
-                    if (err) console.error('Error removing temporary video file:', err);
+                // Send the file if it exists
+                res.sendFile(outputFilePath, (err) => {
+                    //res.download(outputFilePath, 'video.mp4', (err) => {
+                    if (err) {
+                        console.error('Error sending file:', err);
+                    }
+
+                    // Cleanup temporary files after sending response
+                    fs.unlink(outputFilePath, (err) => {
+                        if (err) console.error('Error removing temporary output file:', err);
+                    });
+                    // Cleanup temporary files after sending response
+                    fs.unlink(tempVideoPath, (err) => {
+                        if (err) console.error('Error removing temporary video file:', err);
+                    });
                 });
             });
         });
-    });
+    }
 }
 const generateText = (text, timePoints) => {
     let drawTextCommands = '';
