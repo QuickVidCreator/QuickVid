@@ -162,6 +162,7 @@ async function processRedditStory(req, res) {
 
     const VideoTitleSet = `drawtext=text='${VideoTitle}':x=(w-text_w)/2:y=(h-text_h)/6:fontsize=100:fontcolor=white:fontfile='${fontPath}'`;
 
+    const firstoutputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
     const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
     VideoText = VideoText.replace(/'/g, "\u2019");
     const RedditText = generateText(VideoText, timePoints);
@@ -188,8 +189,7 @@ async function processRedditStory(req, res) {
         '-t', '60',                  // Set video duration to 60 seconds
         '-f', 'mp4',                 // Output format
         '-max_muxing_queue_size', '4096', // Increase muxing queue size
-        //outputFilePath               // Write to the temporary file
-        'pipe:1'
+        firstoutputFilePath               // Write to the temporary file
     ], {
         stdio: [
             'pipe', 'pipe', 'pipe',   // stdin, stdout, stderr
@@ -198,7 +198,7 @@ async function processRedditStory(req, res) {
         ]
     });
     const finalffmpeg = spawn(ffmpegPath, [
-        '-i', 'pipe:0',  // Read from stdin
+        '-i', firstoutputFilePath,  // Read from stdin
         '-vf', `drawtext=text='testing':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=100:fontcolor=white:fontfile='${fontPath}'`, // Text overlay
         '-c:v', 'libx264',
         '-c:a', 'aac',
