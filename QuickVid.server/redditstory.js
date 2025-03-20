@@ -100,6 +100,7 @@ async function processRedditStory(req, res) {
     console.log(VideoText);
     //generateSpeech('Hello world, how are you today?')
     //.then(result => console.log(result.wordTimings));
+    VideoText = VideoText.replace(/\n+/g, ' ').trim();
     const { audioStream: RedditAudio, timePoints } = await generateSpeech(VideoText);
     //DOWNLOAD VIDEO
     const info = await ytdl.getInfo(videoUrl);
@@ -162,7 +163,7 @@ async function processRedditStory(req, res) {
     const VideoTitleSet = `drawtext=text='${VideoTitle}':x=(w-text_w)/2:y=(h-text_h)/6:fontsize=100:fontcolor=white:fontfile='${fontPath}'`;
 
     const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
-    VideoText = VideoText.replace(/'/g, "''"); // Double up apostrophes
+    VideoText = VideoText.replace(/'/g, "\u2019");
     const RedditText = generateText(VideoText, timePoints);
     console.log(RedditText);
     const ffmpeg = spawn(ffmpegPath, [
@@ -187,7 +188,8 @@ async function processRedditStory(req, res) {
         '-t', '60',                  // Set video duration to 60 seconds
         '-f', 'mp4',                 // Output format
         '-max_muxing_queue_size', '4096', // Increase muxing queue size
-        outputFilePath               // Write to the temporary file
+        //outputFilePath               // Write to the temporary file
+        'pipe:1'
     ], {
         stdio: [
             'pipe', 'pipe', 'pipe',   // stdin, stdout, stderr
@@ -195,7 +197,14 @@ async function processRedditStory(req, res) {
             'pipe'                    // audio input
         ]
     });
-
+    const finalffmpeg = spawn(ffmpegPath, [
+        '-i', 'pipe:0',  // Read from stdin
+        '-vf', `drawtext=text='testing':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=100:fontcolor=white:fontfile='${fontPath}'`, // Text overlay
+        '-c:v', 'libx264',
+        '-c:a', 'aac',
+        '-preset', 'ultrafast',
+        outputFilePath
+    ]);
     // Pipe video and audio streams into FFmpeg
     //videoStream.pipe(ffmpeg.stdio[3]).on('error', (err) => {
     //if (err.code === 'EPIPE') {
@@ -233,7 +242,7 @@ async function processRedditStory(req, res) {
     });
 
     // When FFmpeg finishes, handle sending the result to the client
-    ffmpeg.on('close', (code) => {
+    finalffmpeg.on('close', (code) => {
         console.log(`FFmpeg process closed with code ${code}`);
 
         // Attempt to send the video file to the client, even if FFmpeg failed
