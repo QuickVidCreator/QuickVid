@@ -213,6 +213,22 @@ async function processRedditStory(req, res) {
             console.error('Error in audio stream:', err);
         }
     });
+    videoStream.on('end', () => {
+        ffmpeg.stdio[3].end(); // Close video input pipe
+    });
+
+    RedditAudio.on('end', () => {
+        ffmpeg.stdio[4].end(); // Close audio input pipe
+    });
+    // Handle stderr to log any errors
+    ffmpeg.stderr.on('data', (data) => {
+        console.error(`FFmpeg stderr: ${data}`);
+    });
+    // Handle errors during the FFmpeg process
+    ffmpeg.on('error', (err) => {
+        console.error('FFmpeg error:', err);
+    });
+
     ffmpeg.on('exit', (code) => {
         console.log("NEXT PROCESS");
         const finalffmpeg = spawn(ffmpegPath, [
@@ -223,24 +239,6 @@ async function processRedditStory(req, res) {
             '-preset', 'ultrafast',
             outputFilePath
         ]);
-        // Ensure that FFmpeg knows the end of input streams is coming by explicitly ending the pipes
-        videoStream.on('end', () => {
-            ffmpeg.stdio[3].end(); // Close video input pipe
-        });
-
-        RedditAudio.on('end', () => {
-            ffmpeg.stdio[4].end(); // Close audio input pipe
-        });
-
-        // Handle stderr to log any errors
-        ffmpeg.stderr.on('data', (data) => {
-            console.error(`FFmpeg stderr: ${data}`);
-        });
-
-        // Handle errors during the FFmpeg process
-        ffmpeg.on('error', (err) => {
-            console.error('FFmpeg error:', err);
-        });
 
         // When FFmpeg finishes, handle sending the result to the client
         finalffmpeg.on('close', (code) => {
@@ -267,6 +265,10 @@ async function processRedditStory(req, res) {
                     // Cleanup temporary files after sending response
                     fs.unlink(tempVideoPath, (err) => {
                         if (err) console.error('Error removing temporary video file:', err);
+                    });
+                    // Cleanup temporary files after sending response
+                    fs.unlink(firstoutputFilePath, (err) => {
+                        if (err) console.error('Error removing temporary output file:', err);
                     });
                 });
             });
