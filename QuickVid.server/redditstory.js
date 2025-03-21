@@ -175,7 +175,7 @@ async function processRedditStory(req, res) {
         VideoText = words.slice(0, 130).join(" "); // Keep the first 130 words
     };
     const RedditText = generateText(VideoText, timePoints);
-    const RedditText2 = generateText(VideoText2, timePoints2);
+    const RedditText2 = generateText2(VideoText2, timePoints, timePoints2);
     console.log(RedditText);
     const ffmpeg = spawn(ffmpegPath, [
         '-f', 'mp4',  // Force input format
@@ -308,6 +308,28 @@ const generateText = (text, timePoints) => {
 
     return drawTextCommands.slice(0, -1);
 };
+    const generateText2 = (text, timePoints, timePoints2) => {
+        let drawTextCommands = '';
+        const words = text.split(' '); // Still need this to get the actual words
+        let startTime = timePoints[129]; // Start from last value of timePoints
+        for (let i = 0; i < timePoints2.length; i++) {
+            const word = words[i];
+            const endTime = timePoints2[i];
+
+            console.log(`Word: ${word} - Starting: ${startTime} Ending: ${endTime}`);
+
+            drawTextCommands += `drawtext=text='${word}':` +
+                `x=(w-text_w)/2:` +
+                `y=(h-text_h)/3:` +
+                `fontsize=100:` +
+                `fontcolor=white:` +
+                `fontfile='${fontPath}':` +
+                `enable='between(t,${startTime},${endTime})',`;
+            startTime = endTime;
+        }
+
+        return drawTextCommands.slice(0, -1);
+    };
 //const generateText = async (text) => {
 //    const timeTracker = 1;
 //    const startTime = 0;
