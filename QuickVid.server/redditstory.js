@@ -101,7 +101,7 @@ async function processRedditStory(req, res) {
     //generateSpeech('Hello world, how are you today?')
     //.then(result => console.log(result.wordTimings));
     VideoText = VideoText.replace(/\n+/g, ' ').trim();
-    const { audioStream: RedditAudio, timePoints } = await generateSpeech(VideoText);
+    let { audioStream: RedditAudio, timePoints } = await generateSpeech(VideoText);
     //DOWNLOAD VIDEO
     const info = await ytdl.getInfo(videoUrl);
 
@@ -165,7 +165,17 @@ async function processRedditStory(req, res) {
     const firstoutputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
     const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
     VideoText = VideoText.replace(/'/g, "\u2019");
+    let timePoints2 = [];
+    let VideoText2 = "";
+    if (timePoints.length > 130) {
+        timePoints2 = timePoints.slice(130); // From index 130 to the end
+        timePoints = timePoints.slice(0, 130); // Only the first 130 elements
+        let words = VideoText.split(" "); // Split the string into an array of words
+        VideoText2 = words.slice(130).join(" "); // Get words from index 130 onward
+        VideoText = words.slice(0, 130).join(" "); // Keep the first 130 words
+    };
     const RedditText = generateText(VideoText, timePoints);
+    const RedditText2 = generateText(VideoText2, timePoints2);
     console.log(RedditText);
     const ffmpeg = spawn(ffmpegPath, [
         '-f', 'mp4',  // Force input format
@@ -233,7 +243,7 @@ async function processRedditStory(req, res) {
         console.log("NEXT PROCESS");
         const finalffmpeg = spawn(ffmpegPath, [
             '-i', firstoutputFilePath,  // Read from stdin
-            '-vf', `drawtext=text='testing':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=100:fontcolor=white:fontfile='${fontPath}'`, // Text overlay
+            '-vf', RedditText2, // Text overlay
             '-c:v', 'libx264',
             '-c:a', 'aac',
             '-preset', 'ultrafast',
@@ -273,7 +283,7 @@ async function processRedditStory(req, res) {
                 });
             });
         });
-    }
+    });
 }
 const generateText = (text, timePoints) => {
     let drawTextCommands = '';
