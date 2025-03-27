@@ -2,7 +2,7 @@ const express = require('express');
 const https = require('https');  // Import the https module
 const ytdl = require('@distube/ytdl-core');
 const { createProxyAgent } = require('@distube/ytdl-core');  // Import createProxyAgent from distube's ytdl-core
-const gTTS = require('gtts');
+//const gTTS = require('gtts');
 const ffmpegPath = require('ffmpeg-static');
 const { spawn } = require('child_process');
 const fs = require('fs');
@@ -97,62 +97,79 @@ async function processRedditStory(req, res) {
     } = req.body;
     //VideoText = VideoText.replace(/'/g, "");
     console.log("REDDIT STORY SUCCESS");
+    // Set headers for video download
+    res.header('Content-Disposition', 'attachment; filename="video.mp4"');
+    res.header('Content-Type', mime.lookup('mp4') || 'application/octet-stream');
+    res.header('Cache-Control', 'no-cache');
+    res.header('Connection', 'keep-alive'); // Prevents premature disconnect
     console.log(VideoText);
     //generateSpeech('Hello world, how are you today?')
     //.then(result => console.log(result.wordTimings));
     VideoText = VideoText.replace(/\n+/g, ' ').trim();
     let { audioStream: RedditAudio, timePoints } = await generateSpeech(VideoText);
     //DOWNLOAD VIDEO
-    const info = await ytdl.getInfo(videoUrl);
+    let tempVideoPath = path.join(__dirname, `backgroundvideo-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
+    try {
+        const info = await ytdl.getInfo(videoUrl);
+        console.log("finding info");
+        let format = info.formats.find(format => format.qualityLabel === '1080p60' && format.container === 'mp4');
+        if (!format) {
+            format = info.formats.find(format => format.qualityLabel === '1440p60' && format.container === 'mp4');
+            console.log("144060");
+        }
+        if (!format) {
+            format = info.formats.find(format => format.qualityLabel === '1440p' && format.container === 'mp4');
+            console.log("1440");
+        }
+        if (!format) {
+            format = info.formats.find(format => format.qualityLabel === '1440p' && format.container === 'mp4');
+        }
+        if (!format) {
+            format = ytdl.chooseFormat(info.formats, {
+                quality: 'highestvideo',
+                container: 'mp4'
+            });
+            console.log("HIGHEST");
+        }
+        if (!format) {
+            return res.status(400).send('No suitable format found.');
+        }
+        console.log(format);
+        console.log(info);
+        ytdl(videoUrl, { format: format, begin: `${clipStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
+    }
+    catch (error) {
+        console.log("YTDL FAILED, SWITCHING TO YT-DPL");
+        tempVideoPath = path.join(__dirname, 'testclip.mp4');
+    }
+    // const clipStartTime = videoStartTime;
+    // const clipDuration = 40; // Clip length (60 seconds)
 
-    let format = info.formats.find(format => format.qualityLabel === '1080p60' && format.container === 'mp4');
-    if (!format) {
-        format = info.formats.find(format => format.qualityLabel === '1440p60' && format.container === 'mp4');
-    }
-    if (!format) {
-        format = info.formats.find(format => format.qualityLabel === '1440p' && format.container === 'mp4');
-    }
-    if (!format) {
-        format = info.formats.find(format => format.qualityLabel === '1440p' && format.container === 'mp4');
-    }
-    if (!format) {
-        format = ytdl.chooseFormat(info.formats, {
-            quality: 'highestvideo',
-            container: 'mp4'
-        });
-    }
-    if (!format) {
-        return res.status(400).send('No suitable format found.');
-    }
-    console.log(format);
-    console.log(info);
-    // Set headers for video download
-    res.header('Content-Disposition', 'attachment; filename="video.mp4"');
-    res.header('Content-Type', mime.lookup('mp4') || 'application/octet-stream');
-    res.header('Cache-Control', 'no-cache');
-    res.header('Connection', 'keep-alive'); // Prevents premature disconnect
-    const clipStartTime = videoStartTime;
-    const clipDuration = 40; // Clip length (60 seconds)
+    // const videoStream = ytdl(videoUrl, {
+    // format: format,
+    // begin: `${clipStartTime}s`,
+    // highWaterMark: 1024 * 1024 * 10, // 10MB buffer (default is much smaller)
+    // }).on('error', (err) => {
+    // console.error('YT video stream error:', err);
+    // res.status(500).send('Failed to process video.');
+    // });
+    //const tempVideoPath = path.join(__dirname, `backgroundvideo-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
+    //const tempVideoPath = path.join(__dirname, 'testclip.mp4');
 
-    const videoStream = ytdl(videoUrl, {
-        format: format,
-        begin: `${clipStartTime}s`,
-        highWaterMark: 1024 * 1024 * 10, // 10MB buffer (default is much smaller)
-    }).on('error', (err) => {
-        console.error('YT video stream error:', err);
-        res.status(500).send('Failed to process video.');
-    });
-    const tempVideoPath = path.join(__dirname, `backgroundvideo-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
-    ytdl(videoUrl, { format: format, begin: `${clipStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
+    if (!fs.existsSync(tempVideoPath)) {
+        console.error('Video file does not exist:', tempVideoPath);
+        return;
+    }
+    //ytdl(videoUrl, { format: format, begin: `${clipStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
     // Stop stream after 60 seconds
-    setTimeout(() => {
-        videoStream.destroy();
-        console.log("Snippet download stopped.");
-    }, clipDuration * 1000);
-    await new Promise((resolve, reject) => {
-        videoStream.once('readable', resolve);
-        videoStream.once('error', reject);
-    });
+    // setTimeout(() => {
+    // videoStream.destroy();
+    // console.log("Snippet download stopped.");
+    // }, clipDuration * 1000);
+    // await new Promise((resolve, reject) => {
+    // videoStream.once('readable', resolve);
+    // videoStream.once('error', reject);
+    // });
 
 
     // Add this 5-second delay before starting FFmpeg
@@ -162,8 +179,8 @@ async function processRedditStory(req, res) {
 
     const VideoTitleSet = `drawtext=text='${VideoTitle}':x=(w-text_w)/2:y=(h-text_h)/6:fontsize=100:fontcolor=white:fontfile='${fontPath}'`;
 
-    const firstoutputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
-    const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
+    let firstoutputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
+    let outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
     VideoText = VideoText.replace(/'/g, "\u2019");
     let timePoints2 = [];
     let VideoText2 = "";
@@ -178,6 +195,7 @@ async function processRedditStory(req, res) {
     const RedditText2 = generateText2(VideoText2, timePoints, timePoints2);
     console.log(RedditText);
     const ffmpeg = spawn(ffmpegPath, [
+        '-loglevel', 'verbose', // Change 'verbose' to 'debug' for even more logs
         '-f', 'mp4',  // Force input format
         '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
         '-r', '45',
@@ -215,7 +233,7 @@ async function processRedditStory(req, res) {
     //console.error('Error in video stream:', err);
     //}
     //});
-
+    console.log("HERE");
     RedditAudio.pipe(ffmpeg.stdio[4]).on('error', (err) => {
         if (err.code === 'EPIPE') {
             console.warn('Audio stream ended unexpectedly (EPIPE)');
@@ -223,66 +241,104 @@ async function processRedditStory(req, res) {
             console.error('Error in audio stream:', err);
         }
     });
-    videoStream.on('end', () => {
-        ffmpeg.stdio[3].end(); // Close video input pipe
-    });
-
+    //videoStream.on('end', () => {
+    //ffmpeg.stdio[3].end(); // Close video input pipe
+    //});
+    console.log("here 2");
     RedditAudio.on('end', () => {
         ffmpeg.stdio[4].end(); // Close audio input pipe
     });
+    console.log("here 3");
     // Handle stderr to log any errors
     ffmpeg.stderr.on('data', (data) => {
         console.error(`FFmpeg stderr: ${data}`);
     });
+    console.log("here 4");
     // Handle errors during the FFmpeg process
     ffmpeg.on('error', (err) => {
         console.error('FFmpeg error:', err);
     });
-
+    console.log('here');
     ffmpeg.on('exit', (code) => {
         console.log("NEXT PROCESS");
-        const finalffmpeg = spawn(ffmpegPath, [
-            '-i', firstoutputFilePath,  // Read from stdin
-            '-vf', RedditText2, // Text overlay
-            '-c:v', 'libx264',
-            '-c:a', 'aac',
-            '-preset', 'ultrafast',
-            outputFilePath
-        ]);
+        if (timePoints.length > 130) {
+            const finalffmpeg = spawn(ffmpegPath, [
+                '-i', firstoutputFilePath,  // Read from stdin
+                '-vf', RedditText2, // Text overlay
+                '-c:v', 'libx264',
+                '-c:a', 'aac',
+                '-preset', 'ultrafast',
+                outputFilePath
+            ]);
+            // When FFmpeg finishes, handle sending the result to the client
+            finalffmpeg.on('close', (code) => {
+                console.log(`FFmpeg process closed with code ${code}`);
 
-        // When FFmpeg finishes, handle sending the result to the client
-        finalffmpeg.on('close', (code) => {
-            console.log(`FFmpeg process closed with code ${code}`);
-
-            // Attempt to send the video file to the client, even if FFmpeg failed
-            fs.stat(outputFilePath, (err, stats) => {
-                if (err || !stats.isFile()) {
-                    console.error('Output file not found or inaccessible:', err);
-                    return res.status(500).send('Failed to generate video.');
-                }
-
-                // Send the file if it exists
-                res.sendFile(outputFilePath, (err) => {
-                    //res.download(outputFilePath, 'video.mp4', (err) => {
-                    if (err) {
-                        console.error('Error sending file:', err);
+                // Attempt to send the video file to the client, even if FFmpeg failed
+                fs.stat(outputFilePath, (err, stats) => {
+                    if (err || !stats.isFile()) {
+                        console.error('Output file not found or inaccessible:', err);
+                        return res.status(500).send('Failed to generate video.');
                     }
 
-                    // Cleanup temporary files after sending response
-                    fs.unlink(outputFilePath, (err) => {
-                        if (err) console.error('Error removing temporary output file:', err);
-                    });
-                    // Cleanup temporary files after sending response
-                    fs.unlink(tempVideoPath, (err) => {
-                        if (err) console.error('Error removing temporary video file:', err);
-                    });
-                    // Cleanup temporary files after sending response
-                    fs.unlink(firstoutputFilePath, (err) => {
-                        if (err) console.error('Error removing temporary output file:', err);
+                    // Send the file if it exists
+                    res.sendFile(outputFilePath, (err) => {
+                        //res.download(outputFilePath, 'video.mp4', (err) => {
+                        if (err) {
+                            console.error('Error sending file:', err);
+                        }
+
+                        // Cleanup temporary files after sending response
+                        fs.unlink(outputFilePath, (err) => {
+                            if (err) console.error('Error removing temporary output file:', err);
+                        });
+                        // Cleanup temporary files after sending response
+                        //fs.unlink(tempVideoPath, (err) => {
+                        //if (err) console.error('Error removing temporary video file:', err);
+                        //});
+                        // Cleanup temporary files after sending response
+                        fs.unlink(firstoutputFilePath, (err) => {
+                            if (err) console.error('Error removing temporary output file:', err);
+                        });
                     });
                 });
             });
-        });
+        }
+        else {
+            // When FFmpeg finishes, handle sending the result to the client
+            ffmpeg.on('close', (code) => {
+                console.log(`FFmpeg process closed with code ${code}`);
+
+                // Attempt to send the video file to the client, even if FFmpeg failed
+                fs.stat(firstoutputFilePath, (err, stats) => {
+                    if (err || !stats.isFile()) {
+                        console.error('Output file not found or inaccessible:', err);
+                        return res.status(500).send('Failed to generate video.');
+                    }
+
+                    // Send the file if it exists
+                    res.sendFile(firstoutputFilePath, (err) => {
+                        //res.download(outputFilePath, 'video.mp4', (err) => {
+                        if (err) {
+                            console.error('Error sending file:', err);
+                        }
+
+                        // Cleanup temporary files after sending response
+                        //fs.unlink(outputFilePath, (err) => {
+                        //if (err) console.error('Error removing temporary output file:', err);
+                        //});
+                        // Cleanup temporary files after sending response
+                        //fs.unlink(tempVideoPath, (err) => {
+                        //if (err) console.error('Error removing temporary video file:', err);
+                        //});
+                        // Cleanup temporary files after sending response
+                        fs.unlink(firstoutputFilePath, (err) => {
+                            if (err) console.error('Error removing temporary output file:', err);
+                        });
+                    });
+                });
+            });
+        }
     });
 }
 const generateText = (text, timePoints) => {
@@ -302,54 +358,36 @@ const generateText = (text, timePoints) => {
             `y=(h-text_h)/3:` +
             `fontsize=100:` +
             `fontcolor=white:` +
+            //`border=5:` +
+            //`bordercolor=black@0.9:` +
             `fontfile='${fontPath}':` +
             `enable='between(t,${startTime},${endTime})',`;
     }
 
     return drawTextCommands.slice(0, -1);
 };
-    const generateText2 = (text, timePoints, timePoints2) => {
-        let drawTextCommands = '';
-        const words = text.split(' '); // Still need this to get the actual words
-        let startTime = timePoints[129]; // Start from last value of timePoints
-        for (let i = 0; i < timePoints2.length; i++) {
-            const word = words[i];
-            const endTime = timePoints2[i];
+const generateText2 = (text, timePoints, timePoints2) => {
+    let drawTextCommands = '';
+    const words = text.split(' '); // Still need this to get the actual words
+    let startTime = timePoints[129]; // Start from last value of timePoints
+    for (let i = 0; i < timePoints2.length; i++) {
+        const word = words[i];
+        const endTime = timePoints2[i];
 
-            console.log(`Word: ${word} - Starting: ${startTime} Ending: ${endTime}`);
+        console.log(`Word: ${word} - Starting: ${startTime} Ending: ${endTime}`);
 
-            drawTextCommands += `drawtext=text='${word}':` +
-                `x=(w-text_w)/2:` +
-                `y=(h-text_h)/3:` +
-                `fontsize=100:` +
-                `fontcolor=white:` +
-                `fontfile='${fontPath}':` +
-                `enable='between(t,${startTime},${endTime})',`;
-            startTime = endTime;
-        }
+        drawTextCommands += `drawtext=text='${word}':` +
+            `x=(w-text_w)/2:` +
+            `y=(h-text_h)/3:` +
+            `fontsize=100:` +
+            `fontcolor=white:` +
+            `fontfile='${fontPath}':` +
+            `enable='between(t,${startTime},${endTime})',`;
+        startTime = endTime;
+    }
 
-        return drawTextCommands.slice(0, -1);
-    };
-//const generateText = async (text) => {
-//    const timeTracker = 1;
-//    const startTime = 0;
-//    const endTime = timePoints[timeTracker];
-//    //let currentTime = 0; // Cumulative time tracker
-//    let drawTextCommands = '';
-
-//    for (let i = 0; i < timePoints.length; i++) {
-//        //const startTime = currentTime / 1000; // Convert ms to seconds
-//        //const endTime = (currentTime + duration) / 1000;
-//        console.log("starting: " + startTime + " Ending: " + endTime);
-//        drawTextCommands += `drawtext=text='${word}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=100:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime},${endTime})',`;
-//        startTime = endTime;
-//        endTime = timePoints[timeTracker + 1];
-//        currentTime += duration; // Update cumulative time
-//    }
-
-//    // Remove the trailing comma
-//    return drawTextCommands.trim().slice(0, -1);
-//};
+    return drawTextCommands.slice(0, -1);
+};
 module.exports = {
     processRedditStory
 };

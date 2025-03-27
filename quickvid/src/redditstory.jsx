@@ -99,7 +99,7 @@ const redditStory = () => {
         setShowProgress(true);
 
         const interval = setInterval(() => {
-            progress += (progress < 0.7 ? 0.003 : (progress < 0.8 ? 0.0020 : 0.001));
+            progress += (progress < 0.7 ? 0.0025 : (progress < 0.8 ? 0.0015 : 0.001));
             setProgressValue(progress);
 
             if (progress >= 1) {
@@ -120,7 +120,7 @@ const redditStory = () => {
 
     return (
         <div className="quiz-container">
-            <button className="back-button">Back</button>
+            <button onClick={handleDownload} className="back-button">Back</button>
             <h1 className="QuestionQuizTitle">Reddit Story</h1>
             <h2 className="QATitles">Set the video background</h2>
             <input
@@ -152,7 +152,7 @@ const redditStory = () => {
             {/*    placeholder="Enter Video Hook"*/}
             {/*    className="text-input" />*/}
             {/*<br />*/}
-            <h2 className="QATitles">Set the reddit story text</h2>
+            <h2 className="QATitles">Set the reddit story text (Limit of 160)</h2>
             <textarea
                 type="text"
                 rows="6"
