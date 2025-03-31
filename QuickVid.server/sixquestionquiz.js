@@ -470,7 +470,7 @@ async function processSixQuestionQuiz(req, res) {
             console.log(info);
             ytdl(videoUrl, { format: format, begin: `${videoStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
             console.log("Waiting for videostream");
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 3000));
             const stats = fs.statSync(tempVideoPath);
             if (stats.size === 0) {
                 // Cleanup temporary files after sending response
@@ -506,6 +506,10 @@ async function processSixQuestionQuiz(req, res) {
             });
 
         }
+        // Add this 2-second delay before starting FFmpeg
+        console.log("Video stream is ready, waiting 2 seconds before starting FFmpeg...");
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log("2-second wait complete, starting FFmpeg process now...");
         //const outputFilePath = path.join('/tmp', 'output.mp4');
         //const outputFilePath = path.join(__dirname, 'video.mp4');
         const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);

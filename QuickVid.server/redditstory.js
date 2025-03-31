@@ -138,7 +138,7 @@ async function processRedditStory(req, res) {
         console.log(info);
         ytdl(videoUrl, { format: format, begin: `${videoStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
         console.log("Waiting for videostream");
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
         const stats = fs.statSync(tempVideoPath);
         if (stats.size === 0) {
             // Cleanup temporary files after sending response
@@ -179,40 +179,15 @@ async function processRedditStory(req, res) {
         }
         //tempVideoPath = path.join(__dirname, 'testclip.mp4');
     }
-    // const clipStartTime = videoStartTime;
-    // const clipDuration = 40; // Clip length (60 seconds)
-
-    // const videoStream = ytdl(videoUrl, {
-    // format: format,
-    // begin: `${clipStartTime}s`,
-    // highWaterMark: 1024 * 1024 * 10, // 10MB buffer (default is much smaller)
-    // }).on('error', (err) => {
-    // console.error('YT video stream error:', err);
-    // res.status(500).send('Failed to process video.');
-    // });
-    //const tempVideoPath = path.join(__dirname, `backgroundvideo-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
-    //const tempVideoPath = path.join(__dirname, 'testclip.mp4');
-
     if (!fs.existsSync(tempVideoPath)) {
         console.error('Video file does not exist:', tempVideoPath);
         return;
     }
-    //ytdl(videoUrl, { format: format, begin: `${clipStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
-    // Stop stream after 60 seconds
-    // setTimeout(() => {
-    // videoStream.destroy();
-    // console.log("Snippet download stopped.");
-    // }, clipDuration * 1000);
-    // await new Promise((resolve, reject) => {
-    // videoStream.once('readable', resolve);
-    // videoStream.once('error', reject);
-    // });
 
-
-    // Add this 5-second delay before starting FFmpeg
-    console.log("Video stream is ready, waiting 5 seconds before starting FFmpeg...");
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    console.log("5-second wait complete, starting FFmpeg process now...");
+    // Add this 2-second delay before starting FFmpeg
+    console.log("Video stream is ready, waiting 2 seconds before starting FFmpeg...");
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    console.log("2-second wait complete, starting FFmpeg process now...");
 
     const VideoTitleSet = `drawtext=text='${VideoTitle}':x=(w-text_w)/2:y=(h-text_h)/6:fontsize=100:fontcolor=white:fontfile='${fontPath}'`;
 
