@@ -395,8 +395,8 @@ const generateText = (text, timePoints) => {
             `y=(h-text_h)/3:` +
             `fontsize=100:` +
             `fontcolor=white:` +
-            `border=5:` +
-            `bordercolor=black@0.9:` +
+            `borderw=3:` +
+            `bordercolor=black:` +
             `fontfile='${fontPath}':` +
             `enable='between(t,${startTime},${endTime})',`;
     }
@@ -418,6 +418,8 @@ const generateText2 = (text, timePoints, timePoints2) => {
             `y=(h-text_h)/3:` +
             `fontsize=100:` +
             `fontcolor=white:` +
+            `borderw=3:` +
+            `bordercolor=black:` +
             `fontfile='${fontPath}':` +
             `enable='between(t,${startTime},${endTime})',`;
         startTime = endTime;

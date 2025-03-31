@@ -121,7 +121,7 @@ const generateText = async (text, times) => {
         const endTime = adjustedTimes[index + 1] ?? startTime + 1; // Default to +1 second
 
         console.log(`Word: '${word}', Start: ${startTime}, End: ${endTime}`);
-        drawTextCommands += `drawtext=text='${word}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=100:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime},${endTime})',`;
+        drawTextCommands += `drawtext=text='${word}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=100:fontcolor=white:borderw=3:bordercolor=black:fontfile='${fontPath}':enable='between(t,${startTime},${endTime})',`;
     });
 
     return drawTextCommands.slice(0, -1);
@@ -132,7 +132,7 @@ const generateAnswers = (text, times, location) => {
     let drawTextCommands = '';
     let startTime = times[0];
     let answerLocationY = location;
-    drawTextCommands += `drawtext=text='${text}':x=${answerLocationX}:y=${answerLocationY}:fontsize=70:fontcolor=white:fontfile='${fontPath}':enable='between(t,${startTime}, 65)',`;
+    drawTextCommands += `drawtext=text='${text}':x=${answerLocationX}:y=${answerLocationY}:fontsize=70:fontcolor=white:borderw=3:bordercolor=black:fontfile='${fontPath}':enable='between(t,${startTime}, 65)',`;
 
     //answerLocationY += 140;
     // Remove the trailing comma
@@ -558,11 +558,6 @@ async function processSixQuestionQuiz(req, res) {
             } else {
                 console.error('Error in audio stream:', err);
             }
-        });
-
-        // Ensure that FFmpeg knows the end of input streams is coming by explicitly ending the pipes
-        videoStream.on('end', () => {
-            ffmpeg.stdio[3].end(); // Close video input pipe
         });
 
         finalStream.on('end', () => {

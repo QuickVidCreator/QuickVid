@@ -41,7 +41,7 @@ const redditStory = () => {
     }
 
     const handleDownload = async () => {
-        updateVideoLimit();
+        //updateVideoLimit();
         if (!videoUrl) {
             alert('Please enter a valid YouTube URL');
             return;
@@ -83,6 +83,7 @@ const redditStory = () => {
             a.remove();
             // Notify progress function that the file is received
             setProgressValue(1);
+            updateVideoLimit();
             setTimeout(() => {
                 setShowProgress(false);
             }, 500);
@@ -99,7 +100,7 @@ const redditStory = () => {
         setShowProgress(true);
 
         const interval = setInterval(() => {
-            progress += (progress < 0.7 ? 0.0025 : (progress < 0.8 ? 0.0015 : 0.001));
+            progress += (progress < 0.7 ? 0.0018 : (progress < 0.8 ? 0.0012 : 0.001));
             setProgressValue(progress);
 
             if (progress >= 1) {
