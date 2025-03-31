@@ -136,11 +136,48 @@ async function processRedditStory(req, res) {
         }
         console.log(format);
         console.log(info);
-        ytdl(videoUrl, { format: format, begin: `${clipStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
+        ytdl(videoUrl, { format: format, begin: `${videoStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
+        console.log("Waiting for videostream");
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const stats = fs.statSync(tempVideoPath);
+        if (stats.size === 0) {
+            // Cleanup temporary files after sending response
+            fs.unlink(tempVideoPath, (err) => {
+                if (err) console.error('Error removing temporary video file:', err);
+            });
+            throw new Error("Download failed: File is empty.");
+        }
     }
     catch (error) {
-        console.log("YTDL FAILED, SWITCHING TO YT-DPL");
-        tempVideoPath = path.join(__dirname, 'testclip.mp4');
+        // Replace your current Python spawn code with this:
+        await new Promise((resolve, reject) => {
+            const pythonProcess = spawn("python", ["download_video.py", videoUrl, tempVideoPath, videoStartTime]);
+
+            pythonProcess.stdout.on("data", (data) => {
+                console.log(`Python Output: ${data.toString()}`);
+            });
+
+            pythonProcess.stderr.on("data", (data) => {
+                console.error(`Python Error: ${data.toString()}`);
+            });
+
+            pythonProcess.on("close", (code) => {
+                console.log(`Python process exited with code ${code}`);
+                if (code === 0) {
+                    resolve();
+                } else {
+                    reject(new Error(`Python process exited with code ${code}`));
+                }
+            });
+        });
+
+        // Then add a check to make sure the file exists and has size
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Small delay to ensure file is accessible
+        const stats = fs.statSync(tempVideoPath);
+        if (stats.size === 0) {
+            throw new Error("Download failed: File is empty.");
+        }
+        //tempVideoPath = path.join(__dirname, 'testclip.mp4');
     }
     // const clipStartTime = videoStartTime;
     // const clipDuration = 40; // Clip length (60 seconds)
@@ -358,8 +395,8 @@ const generateText = (text, timePoints) => {
             `y=(h-text_h)/3:` +
             `fontsize=100:` +
             `fontcolor=white:` +
-            //`border=5:` +
-            //`bordercolor=black@0.9:` +
+            `border=5:` +
+            `bordercolor=black@0.9:` +
             `fontfile='${fontPath}':` +
             `enable='between(t,${startTime},${endTime})',`;
     }

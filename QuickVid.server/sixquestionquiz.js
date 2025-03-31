@@ -434,63 +434,78 @@ async function processSixQuestionQuiz(req, res) {
         //const info = await ytdl.getInfo(videoUrl, { agent });
         //console.log(info);
         console.log("post proxy");
-
-        //const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
-        const info = await ytdl.getInfo(videoUrl);
-
-        let format = info.formats.find(format => format.qualityLabel === '1080p60' && format.container === 'mp4');
-        if (!format) {
-            format = info.formats.find(format => format.qualityLabel === '1440p60' && format.container === 'mp4');
-        }
-        if (!format) {
-            format = info.formats.find(format => format.qualityLabel === '1080p' && format.container === 'mp4');
-        }
-        if (!format) {
-            format = info.formats.find(format => format.qualityLabel === '1440p' && format.container === 'mp4');
-        }
-        if (!format) {
-            format = ytdl.chooseFormat(info.formats, {
-                quality: 'highestvideo',
-                container: 'mp4'
-            });
-        }
-        if (!format) {
-            return res.status(400).send('No suitable format found.');
-        }
-
         // Set headers for video download
         res.header('Content-Disposition', 'attachment; filename="video.mp4"');
         res.header('Content-Type', mime.lookup('mp4') || 'application/octet-stream');
         res.header('Cache-Control', 'no-cache');
         res.header('Connection', 'keep-alive'); // Prevents premature disconnect
+        //DOWNLOAD VIDEO
+        let tempVideoPath = path.join(__dirname, `backgroundvideo-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
+        try {
+            const info = await ytdl.getInfo(videoUrl);
+            console.log("finding info");
+            let format = info.formats.find(format => format.qualityLabel === '1080p60' && format.container === 'mp4');
+            if (!format) {
+                format = info.formats.find(format => format.qualityLabel === '1440p60' && format.container === 'mp4');
+                console.log("144060");
+            }
+            if (!format) {
+                format = info.formats.find(format => format.qualityLabel === '1440p' && format.container === 'mp4');
+                console.log("1440");
+            }
+            if (!format) {
+                format = info.formats.find(format => format.qualityLabel === '1440p' && format.container === 'mp4');
+            }
+            if (!format) {
+                format = ytdl.chooseFormat(info.formats, {
+                    quality: 'highestvideo',
+                    container: 'mp4'
+                });
+                console.log("HIGHEST");
+            }
+            if (!format) {
+                return res.status(400).send('No suitable format found.');
+            }
+            console.log(format);
+            console.log(info);
+            ytdl(videoUrl, { format: format, begin: `${videoStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
+            console.log("Waiting for videostream");
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            const stats = fs.statSync(tempVideoPath);
+            if (stats.size === 0) {
+                // Cleanup temporary files after sending response
+                fs.unlink(tempVideoPath, (err) => {
+                    if (err) console.error('Error removing temporary video file:', err);
+                });
+                throw new Error("Download failed: File is empty.");
+            }
+            console.log("Continuing with stream");
+            await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+        catch (error) {
+            // Replace your current Python spawn code with this:
+            await new Promise((resolve, reject) => {
+                const pythonProcess = spawn("python", ["download_video.py", videoUrl, tempVideoPath, videoStartTime]);
 
+                pythonProcess.stdout.on("data", (data) => {
+                    console.log(`Python Output: ${data.toString()}`);
+                });
 
-        const clipStartTime = videoStartTime;
-        const clipDuration = 40; // Clip length (60 seconds)
+                pythonProcess.stderr.on("data", (data) => {
+                    console.error(`Python Error: ${data.toString()}`);
+                });
 
-        const videoStream = ytdl(videoUrl, {
-            format: format,
-            begin: `${clipStartTime}s`,
-            highWaterMark: 1024 * 1024 * 10, // 10MB buffer (default is much smaller)
-        }).on('error', (err) => {
-            console.error('YT video stream error:', err);
-            res.status(500).send('Failed to process video.');
-        });
-        const tempVideoPath = path.join(__dirname, `backgroundvideo-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
-        ytdl(videoUrl, { format: format, begin: `${clipStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
-        // Stop stream after 60 seconds
-        setTimeout(() => {
-            videoStream.destroy();
-            console.log("Snippet download stopped.");
-        }, clipDuration * 1000);
-        await new Promise((resolve, reject) => {
-            videoStream.once('readable', resolve);
-            videoStream.once('error', reject);
-        });
-        // Add this 5-second delay before starting FFmpeg
-        console.log("Video stream is ready, waiting 5 seconds before starting FFmpeg...");
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        console.log("5-second wait complete, starting FFmpeg process now...");
+                pythonProcess.on("close", (code) => {
+                    console.log(`Python process exited with code ${code}`);
+                    if (code === 0) {
+                        resolve();
+                    } else {
+                        reject(new Error(`Python process exited with code ${code}`));
+                    }
+                });
+            });
+
+        }
         //const outputFilePath = path.join('/tmp', 'output.mp4');
         //const outputFilePath = path.join(__dirname, 'video.mp4');
         const outputFilePath = path.join(__dirname, `video-${Date.now()}-${Math.random().toString(36).substring(7)}.mp4`);
