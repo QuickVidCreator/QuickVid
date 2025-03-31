@@ -92,6 +92,7 @@ const redditStory = () => {
             alert('An error occurred while downloading the video.');
         } finally {
             setIsDownloading(false);
+            setProgressValue(0);
         }
     };
 
