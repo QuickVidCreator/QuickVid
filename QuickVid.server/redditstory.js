@@ -136,7 +136,8 @@ async function processRedditStory(req, res) {
         }
         console.log(format);
         console.log(info);
-        ytdl(videoUrl, { format: format, begin: `${videoStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
+        //ytdl(videoUrl, { format: format, begin: `${videoStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
+        ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
         console.log("Waiting for videostream");
         await new Promise(resolve => setTimeout(resolve, 3000));
         const stats = fs.statSync(tempVideoPath);
@@ -209,7 +210,7 @@ async function processRedditStory(req, res) {
     const ffmpeg = spawn(ffmpegPath, [
         '-loglevel', 'verbose', // Change 'verbose' to 'debug' for even more logs
         '-f', 'mp4',  // Force input format
-        '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
+        '-ss', videoStartTime,                  // Start from the beginning (ensures the video is trimmed from start)
         '-r', '45',
         //'-thread_queue_size', '1024', // Increase thread queue for audio input
         //'-i', 'pipe:3',              // Video stream input

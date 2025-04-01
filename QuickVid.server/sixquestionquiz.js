@@ -468,7 +468,8 @@ async function processSixQuestionQuiz(req, res) {
             }
             console.log(format);
             console.log(info);
-            ytdl(videoUrl, { format: format, begin: `${videoStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
+            //ytdl(videoUrl, { format: format, begin: `${videoStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
+            ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
             console.log("Waiting for videostream");
             await new Promise(resolve => setTimeout(resolve, 3000));
             const stats = fs.statSync(tempVideoPath);
@@ -530,7 +531,7 @@ async function processSixQuestionQuiz(req, res) {
         //const Question6Ans = `drawtext=text='${Question6A}':x=200:y=1750:fontsize=70:fontcolor=white:enable='between(t,5,65)'`;
         const ffmpeg = spawn(ffmpegPath, [
             '-f', 'mp4',  // Force input format
-            '-ss', '0',                  // Start from the beginning (ensures the video is trimmed from start)
+            '-ss', videoStartTime,                  // Start from the beginning (ensures the video is trimmed from start)
             '-r', '45',
             //'-thread_queue_size', '1024', // Increase thread queue for audio input
             //'-i', 'pipe:3',              // Video stream input
