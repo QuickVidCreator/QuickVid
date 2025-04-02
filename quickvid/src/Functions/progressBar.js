@@ -1,5 +1,6 @@
 export function progressBarFunction(setShowProgress, setProgressValue) {
     let progress = 0.0;
+    setProgressValue(0);
     setShowProgress(true);
 
     const interval = setInterval(() => {
