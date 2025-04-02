@@ -87,12 +87,12 @@ const redditStory = () => {
             setTimeout(() => {
                 setShowProgress(false);
             }, 500);
+            setProgressValue(0);
         } catch (error) {
             console.error('Error during download:', error);
             alert('An error occurred while downloading the video.');
         } finally {
             setIsDownloading(false);
-            setProgressValue(0);
         }
     };
 
@@ -101,7 +101,7 @@ const redditStory = () => {
         setShowProgress(true);
 
         const interval = setInterval(() => {
-            progress += (progress < 0.7 ? 0.0018 : (progress < 0.8 ? 0.0012 : 0.001));
+            progress += (progress < 0.7 ? 0.0015 : (progress < 0.8 ? 0.0010 : 0.0007));
             setProgressValue(progress);
 
             if (progress >= 1) {

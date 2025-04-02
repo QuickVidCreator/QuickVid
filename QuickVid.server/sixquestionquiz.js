@@ -317,6 +317,7 @@ async function processSixQuestionQuiz(req, res) {
         console.log(FullSpeech);
         const wordGenerationLines = await generateText(FullSpeech, timePoints);
         console.log(wordGenerationLines);
+        console.log(videoUrl);
 
         const cleantimePoints = timePoints.filter(point => point !== "break");
         //VIDEO HOOK TIMING
@@ -486,7 +487,7 @@ async function processSixQuestionQuiz(req, res) {
         catch (error) {
             // Replace your current Python spawn code with this:
             await new Promise((resolve, reject) => {
-                const pythonProcess = spawn("python", ["download_video.py", videoUrl, tempVideoPath, videoStartTime]);
+                const pythonProcess = spawn("python", ["download_video.py", videoUrl, tempVideoPath]);
 
                 pythonProcess.stdout.on("data", (data) => {
                     console.log(`Python Output: ${data.toString()}`);
@@ -532,7 +533,7 @@ async function processSixQuestionQuiz(req, res) {
         const ffmpeg = spawn(ffmpegPath, [
             '-f', 'mp4',  // Force input format
             '-ss', videoStartTime,                  // Start from the beginning (ensures the video is trimmed from start)
-            '-r', '45',
+            //'-r', '45',
             //'-thread_queue_size', '1024', // Increase thread queue for audio input
             //'-i', 'pipe:3',              // Video stream input
             '-i', tempVideoPath,         // Use the file instead of pipe:3

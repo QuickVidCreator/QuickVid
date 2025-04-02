@@ -97,6 +97,7 @@ async function processRedditStory(req, res) {
     } = req.body;
     //VideoText = VideoText.replace(/'/g, "");
     console.log("REDDIT STORY SUCCESS");
+    console.log(videoUrl);
     // Set headers for video download
     res.header('Content-Disposition', 'attachment; filename="video.mp4"');
     res.header('Content-Type', mime.lookup('mp4') || 'application/octet-stream');
@@ -134,8 +135,7 @@ async function processRedditStory(req, res) {
         if (!format) {
             return res.status(400).send('No suitable format found.');
         }
-        console.log(format);
-        console.log(info);
+        console.log(JSON.stringify(format, null, 2));
         //ytdl(videoUrl, { format: format, begin: `${videoStartTime}s`, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
         ytdl(videoUrl, { format: format, highWaterMark: 1024 * 1024 * 10 }).pipe(fs.createWriteStream(tempVideoPath));
         console.log("Waiting for videostream");
@@ -148,11 +148,13 @@ async function processRedditStory(req, res) {
             });
             throw new Error("Download failed: File is empty.");
         }
+
     }
     catch (error) {
         // Replace your current Python spawn code with this:
         await new Promise((resolve, reject) => {
-            const pythonProcess = spawn("python", ["download_video.py", videoUrl, tempVideoPath, videoStartTime]);
+            //const pythonProcess = spawn("python", ["download_video.py", videoUrl, tempVideoPath]);
+            const pythonProcess = spawn("python", ["download_video.py", videoUrl, tempVideoPath]);
 
             pythonProcess.stdout.on("data", (data) => {
                 console.log(`Python Output: ${data.toString()}`);
@@ -211,7 +213,7 @@ async function processRedditStory(req, res) {
         '-loglevel', 'verbose', // Change 'verbose' to 'debug' for even more logs
         '-f', 'mp4',  // Force input format
         '-ss', videoStartTime,                  // Start from the beginning (ensures the video is trimmed from start)
-        '-r', '45',
+        //'-r', '45',
         //'-thread_queue_size', '1024', // Increase thread queue for audio input
         //'-i', 'pipe:3',              // Video stream input
         '-i', tempVideoPath,         // Use the file instead of pipe:3
