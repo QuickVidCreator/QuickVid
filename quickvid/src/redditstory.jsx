@@ -53,7 +53,7 @@ const redditStory = () => {
             return;
         }
         setIsDownloading(true);
-        progressBarFunction()
+        progressBarFunction(setShowProgress, setProgressValue);
 
         try {
             //const response = await fetch('https://75.135.157.2:3000/download', {

@@ -1,4 +1,4 @@
-export function progressBarFunction() {
+export function progressBarFunction(setShowProgress, setProgressValue) {
     let progress = 0.0;
     setShowProgress(true);
 
@@ -9,7 +9,7 @@ export function progressBarFunction() {
         if (progress >= 1) {
             clearInterval(interval);
         }
-    }, 50); // Runs every 100ms
+    }, 50);
 
     // Stop the progress when the file is received
     setProgressValue(prev => {
