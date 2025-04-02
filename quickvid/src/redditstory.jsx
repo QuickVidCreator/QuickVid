@@ -5,7 +5,7 @@ import './redditstory.css'; // Import the CSS file
 import './global.css';
 import { getVideoLimit } from './Functions/userInfo.js';
 import { updateVideoLimit } from './Functions/userInfo.js';
-import { progressBarFunction } from "./progressBar";
+import { progressBarFunction } from "./Functions/progressBar.js";
 
 
 let videoBtnSet = true;
