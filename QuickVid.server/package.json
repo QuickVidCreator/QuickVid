@@ -10,7 +10,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@distube/ytdl-core": "^4.15.8",
+    "@distube/ytdl-core": "^4.16.6",
     "@google-cloud/text-to-speech": "^5.8.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",
