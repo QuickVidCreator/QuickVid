@@ -1,55 +1,22 @@
-﻿import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { useState, useEffect } from 'react'; // Added useState & useEffect
-import './App.css';
-import NormalQuiz from './NormalQuiz';
-import RedditStory from './redditstory'; // Make sure you import the RedditStory component
-import { getVideoLimit } from './Functions/userInfo.js';  // Adjust the path based on your project structure
-import { setUserData } from './Functions/userInfo.js';
-//import { userData } from './Functions/userInfo.js';
+﻿import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import RedditStory from "./redditstory";
+import NormalQuiz from "./NormalQuiz";
+import { getVideoLimit, userData as userDataTemp } from "./userInfo";
 
 const App = () => {
-    const [userDataTemp, setUserDataTemp] = useState(null);
     const [videoLimit, setVideoLimit] = useState(null);
+
     useEffect(() => {
-        console.log("Setting up message listener...");
-        const handleMessage = (event) => {
-            console.log("Message received from:", event.origin);
-            console.log("Message data:", event.data);
-
-            // Send log back to the parent (WordPress) for debugging
-            window.parent.postMessage(
-                { log: "Message received", origin: event.origin, data: event.data },
-                "*"
-            );
-
-            // Ensure we only accept messages from the WordPress site
-            //if (event.origin !== "https://quick-vid.com") return;
-
-            if (event.data && event.data.username) {
-                setUserDataTemp(event.data);
-                console.log("✅ Received user data:", event.data);
-
-                // Also send confirmation back to WordPress
-                window.parent.postMessage(
-                    { log: "User data set successfully", data: event.data },
-                    "*"
-                );
-            }
-        };
-
-        window.addEventListener("message", handleMessage);
-
-        return () => {
-            window.removeEventListener("message", handleMessage);
-        };
-    }, []);
-    setUserData(userDataTemp);
-    const fetchVideoLimit = async () => {
-        const limit = await getVideoLimit(userDataTemp.id);
-        console.log("Fetched video count:", limit);
-        setVideoLimit(limit);
-    };
-    fetchVideoLimit();
+        if (userDataTemp && userDataTemp.id) {
+            const fetchLimit = async () => {
+                const limit = await getVideoLimit(userDataTemp.id);
+                console.log("Fetched video count:", limit);
+                setVideoLimit(limit);
+            };
+            fetchLimit();
+        }
+    }, [userDataTemp]); // Fetch video limit when userDataTemp changes
 
     return (
         <Router>
@@ -60,7 +27,7 @@ const App = () => {
                     ) : (
                         <p>Loading user data...</p>
                     )}
-                        <p>Daily Videos Left: {videoLimit}</p>
+                    <p>Daily Videos Left: {videoLimit}</p>
                 </div>
                 <Routes>
                     <Route
@@ -97,7 +64,7 @@ const App = () => {
                         }
                     />
                     <Route path="/sixquestionquiz" element={<NormalQuiz />} />
-                    <Route path="/redditstory" element={<RedditStory />} />
+                    <Route path="/redditstory" element={<RedditStory setVideoLimit={setVideoLimit} />} />
                 </Routes>
             </div>
         </Router>
