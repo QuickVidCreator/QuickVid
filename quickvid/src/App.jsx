@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import RedditStory from "./redditstory";
 import NormalQuiz from "./NormalQuiz";
-import { getVideoLimit, userData as userDataTemp } from "./userInfo";
+import { getVideoLimit, userData as userDataTemp } from "./Functions/userInfo";
 
 const App = () => {
     const [videoLimit, setVideoLimit] = useState(null);
