@@ -55,17 +55,18 @@ const App = () => {
         <Router>
             <div className="App">
                 <Routes>
-                    <div className="UserInfo">
-                        {userDataTemp ? (
-                            <p>Welcome, {userDataTemp.username} (ID: {userDataTemp.id})</p>
-                        ) : (
-                            <p>Loading user data...</p>
-                        )}
-                        <p>Daily Videos Left: {videoLimit}</p>
-                    </div>
                     <Route
                         path="/"
                         element={
+                            <>
+                                <div className="UserInfo">
+                                    {userDataTemp ? (
+                                        <p>Welcome, {userDataTemp.username} (ID: {userDataTemp.id})</p>
+                                    ) : (
+                                        <p>Loading user data...</p>
+                                    )}
+                                    <p>Daily Videos Left: {videoLimit}</p>
+                                </div>
                             <div className="ButtonsClass">
                                 <Link to="/sixquestionquiz">
                                     <button className="OptionsBtns">
