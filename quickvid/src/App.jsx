@@ -58,7 +58,7 @@ const App = () => {
                     <Route
                         path="/"
                         element={
-                            <>
+                            <div className="ButtonsClass">
                                 <div className="UserInfo">
                                     {userDataTemp ? (
                                         <p>Welcome, {userDataTemp.username} (ID: {userDataTemp.id})</p>
@@ -67,7 +67,6 @@ const App = () => {
                                     )}
                                     <p>Daily Videos Left: {videoLimit}</p>
                                 </div>
-                            <div className="ButtonsClass">
                                 <Link to="/sixquestionquiz">
                                     <button className="OptionsBtns">
                                         <span className="OptionsBtnsTitle">6 Question Quiz</span>
