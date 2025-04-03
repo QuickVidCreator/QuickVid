@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 import './redditstory.css'; // Import the CSS file
 import './global.css';
-import { getVideoLimit} from "./Functions/userInfo";
+import { getVideoLimit } from './Functions/userInfo.js';
 import { updateVideoLimit } from './Functions/userInfo.js';
 import { progressBarFunction } from "./Functions/progressBar.js";
 
@@ -13,7 +13,7 @@ let videoBtnSet = true;
 
 // Call the function to get the video limit
 //getVideoLimit();
-const redditStory = ({setVideoLimit }) => {
+const redditStory = () => {
     const [videoUrl, setVideoUrl] = useState('');
     const [videoStartTime, setVideoStartTime] = useState('');
     const [VideoTitle, setVideoTitle] = useState('');
@@ -22,25 +22,25 @@ const redditStory = ({setVideoLimit }) => {
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
 
-    //const [videoLimit, setVideoLimit] = useState(null);
+    const [videoLimit, setVideoLimit] = useState(null);
     //const userId = 2; // Replace with dynamic user ID if needed
 
-    //useEffect(() => {
-    //    const fetchVideoLimit = async () => {
-    //        const limit = await getVideoLimit();
-    //        console.log("Fetched video count:", limit);
-    //        setVideoLimit(limit);
-    //        if (limit == 0) {
-    //            videoBtnSet = false;
-    //        }
-    //    };
+    useEffect(() => {
+        const fetchVideoLimit = async () => {
+            const limit = await getVideoLimit();
+            console.log("Fetched video count:", limit);
+            setVideoLimit(limit);
+            if (limit == 0) {
+                videoBtnSet = false;
+            }
+        };
 
-    //    fetchVideoLimit();
-    //}, []);
+        fetchVideoLimit();
+    }, []);
 
-    //if (videoLimit === null) {
-    //    return <p>Loading video count...</p>; // Prevents incorrect early check
-    //}
+    if (videoLimit === null) {
+        return <p>Loading video count...</p>; // Prevents incorrect early check
+    }
 
     const handleDownload = async () => {
         //updateVideoLimit();
@@ -86,8 +86,6 @@ const redditStory = ({setVideoLimit }) => {
             // Notify progress function that the file is received
             setProgressValue(1);
             updateVideoLimit();
-            const limit = await getVideoLimit();
-            setVideoLimit(limit);
             setTimeout(() => {
                 setShowProgress(false);
             }, 500);
@@ -102,7 +100,7 @@ const redditStory = ({setVideoLimit }) => {
 
     return (
         <div className="quiz-container">
-            <button className="back-button">Back</button>
+            <button onClick={handleDownload} className="back-button">Back</button>
             <h1 className="QuestionQuizTitle">Reddit Story</h1>
             <h2 className="QATitles">Set the video background</h2>
             <input
@@ -160,7 +158,7 @@ const redditStory = ({setVideoLimit }) => {
                 className="progressOverlay"
                 style={{ display: showProgress ? 'block' : 'none' }}>
                 <h2 className="progress-title">VIDEO IS BEING GENERATED</h2>
-                <progress className="progress-bar" id="progress-bar" value={progressValue}/>
+                <progress className="progress-bar" id="progress-bar" value={progressValue} />
             </div>
         </div>
     );
