@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 import './redditstory.css'; // Import the CSS file
 import './global.css';
-import { getVideoLimit, userData as userDataTemp } from "./userInfo";
+import { getVideoLimit} from "./Functions/userInfo";
 import { updateVideoLimit } from './Functions/userInfo.js';
 import { progressBarFunction } from "./Functions/progressBar.js";
 
