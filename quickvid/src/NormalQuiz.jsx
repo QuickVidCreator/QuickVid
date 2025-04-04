@@ -3,8 +3,9 @@ import './NormalQuiz.css'; // Import the CSS file
 import './global.css';
 
 import { getVideoLimit } from './Functions/userInfo.js';
-import { updateVideoLimit } from './Functions/userInfo.js';
-import { progressBarFunction } from "./Functions/progressBar.js";
+//import { updateVideoLimit } from './Functions/userInfo.js';
+//import { progressBarFunction } from "./Functions/progressBar.js";
+let videoBtnSet = true;
 
 const NormalQuiz = () => {
     const [videoUrl, setVideoUrl] = useState('');
@@ -26,7 +27,6 @@ const NormalQuiz = () => {
     const [VideoOutro, setVideoOutro] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
     let [videoLimit, setVideoLimit] = useState(null);
-    let videoBtnSet = true;
 
     useEffect(() => {
         const fetchVideoLimit = async () => {
