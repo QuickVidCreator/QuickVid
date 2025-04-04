@@ -32,10 +32,13 @@ const redditStory = () => {
             const limit = await getVideoLimit();
             console.log("Fetched video count:", limit);
             setVideoLimit(limit);
-            if (limit == 0) {
+            if (limit === 0) {
                 videoBtnSet = false;
-                downloadBtn.current.textContent = "Out of Generations";
-                downloadBtn.style.backgroundColor = "#999"; // 🟦 Gray when disabled
+
+                if (downloadBtn.current) {
+                    downloadBtn.current.textContent = "Out of Generations";
+                    downloadBtn.current.style.backgroundColor = "#999"; // Gray when disabled
+                }
             }
         };
 
