@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './NormalQuiz.css'; // Import the CSS file
 import './global.css';
 
