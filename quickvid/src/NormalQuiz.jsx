@@ -3,8 +3,8 @@ import './NormalQuiz.css'; // Import the CSS file
 import './global.css';
 
 import { getVideoLimit } from './Functions/userInfo.js';
-//import { updateVideoLimit } from './Functions/userInfo.js';
-//import { progressBarFunction } from "./Functions/progressBar.js";
+import { updateVideoLimit } from './Functions/userInfo.js';
+import { progressBarFunction } from "./Functions/progressBar.js";
 let videoBtnSet = true;
 
 const NormalQuiz = () => {
@@ -25,7 +25,9 @@ const NormalQuiz = () => {
     const [Question6, setQuestion6] = useState(''); // Updated variable name for user input
     const [Question6A, setQuestion6A] = useState(''); // Updated variable name for user input
     const [VideoOutro, setVideoOutro] = useState('');
+    const [showProgress, setShowProgress] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [progressValue, setProgressValue] = useState(false);
     let [videoLimit, setVideoLimit] = useState(null);
 
     useEffect(() => {
@@ -63,6 +65,8 @@ const NormalQuiz = () => {
         }
 
         setIsDownloading(true);
+        progressBarFunction(setShowProgress, setProgressValue);
+
 
         try {
             //const response = await fetch('https://75.135.157.2:3000/download', {
@@ -105,6 +109,17 @@ const NormalQuiz = () => {
             document.body.appendChild(a);
             a.click();
             a.remove();
+            // Notify progress function that the file is received
+            setProgressValue(1);
+            updateVideoLimit();
+            videoLimit = videoLimit - 1;
+            setVideoLimit(videoLimit);
+            if (videoLimit == 0) {
+                videoBtnSet = false;
+            }
+            setTimeout(() => {
+                setShowProgress(false);
+            }, 500);
         } catch (error) {
             console.error('Error during download:', error);
             alert('An error occurred while downloading the video.');
@@ -301,6 +316,13 @@ const NormalQuiz = () => {
                         ? 'Generating...'
                         : 'Generate Video'}
             </button>
+            <div
+                id="progressOverlay"
+                className="progressOverlay"
+                style={{ display: showProgress ? 'block' : 'none' }}>
+                <h2 className="progress-title">VIDEO IS BEING GENERATED</h2>
+                <progress className="progress-bar" id="progress-bar" value={progressValue} />
+            </div>
         </div>
     );
 };
