@@ -100,6 +100,9 @@ const redditStory = () => {
 
     return (
         <div className="quiz-container">
+            <div className="UserInfo">
+                <p>Daily Videos Left: {videoLimit}</p>
+            </div>
             <button onClick={handleDownload} className="back-button">Back</button>
             <h1 className="QuestionQuizTitle">Reddit Story</h1>
             <h2 className="QATitles">Set the video background</h2>
