@@ -1,4 +1,4 @@
-//import { useState } from 'react';
+﻿//import { useState } from 'react';
 import { useState, useEffect } from 'react';
 
 import './redditstory.css'; // Import the CSS file
@@ -22,7 +22,8 @@ const redditStory = () => {
     const [showProgress, setShowProgress] = useState(false);
     const [progressValue, setProgressValue] = useState(false);
 
-    const [videoLimit, setVideoLimit] = useState(null);
+    let [videoLimit, setVideoLimit] = useState(null);
+    const downloadBtn = useRef(null);
     //const userId = 2; // Replace with dynamic user ID if needed
 
     useEffect(() => {
@@ -32,6 +33,8 @@ const redditStory = () => {
             setVideoLimit(limit);
             if (limit == 0) {
                 videoBtnSet = false;
+                downloadBtn.current.textContent = "Out of Generations";
+                downloadBtn.style.backgroundColor = "#999"; // 🟦 Gray when disabled
             }
         };
 
@@ -86,7 +89,11 @@ const redditStory = () => {
             // Notify progress function that the file is received
             setProgressValue(1);
             updateVideoLimit();
-            setVideoLimit(videoLimit - 1);
+            videoLimit = videoLimit - 1;
+            setVideoLimit(videoLimit);
+            if (videoLimit == 0) {
+                videoBtnSet = false;
+            }
             setTimeout(() => {
                 setShowProgress(false);
             }, 500);
