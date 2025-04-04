@@ -161,6 +161,7 @@ const redditStory = () => {
             {/*    className="text-input" />*/}
             <button
                 onClick={handleDownload}
+                ref={downloadBtn}
                 disabled={isDownloading || !videoBtnSet}
                 className={`download-button ${isDownloading ? 'disabled' : ''}`}>
                 {isDownloading ? 'Generating...' : 'Generate Video'}
