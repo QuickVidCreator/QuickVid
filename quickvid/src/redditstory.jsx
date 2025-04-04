@@ -159,7 +159,11 @@ const redditStory = () => {
                 onClick={handleDownload}
                 disabled={isDownloading || !videoBtnSet}
                 className={`download-button ${isDownloading ? 'disabled' : ''} ${!videoBtnSet ? 'out-of-generations' : ''}`}>
-                {isDownloading ? 'Generating...' : 'Generate Video'}
+                {!videoBtnSet
+                    ? 'Out of Generations'
+                    : isDownloading
+                        ? 'Generating...'
+                        : 'Generate Video'}
             </button>
             <div
                 id="progressOverlay"
