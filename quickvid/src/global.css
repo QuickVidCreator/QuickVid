@@ -30,6 +30,9 @@
         background-color: #ccc;
         cursor: not-allowed;
     }
+.out-of-generations {
+    background-color: #999;
+}
 .progressOverlay {
     position: fixed;
     display: none;

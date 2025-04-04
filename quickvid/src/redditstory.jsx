@@ -1,6 +1,5 @@
 ﻿//import { useState } from 'react';
 import { useState, useEffect } from 'react';
-import React, { useRef } from 'react';
 
 import './redditstory.css'; // Import the CSS file
 import './global.css';
@@ -24,7 +23,6 @@ const redditStory = () => {
     const [progressValue, setProgressValue] = useState(false);
 
     let [videoLimit, setVideoLimit] = useState(null);
-    const downloadBtn = useRef(null);
     //const userId = 2; // Replace with dynamic user ID if needed
 
     useEffect(() => {
@@ -34,11 +32,6 @@ const redditStory = () => {
             setVideoLimit(limit);
             if (limit === 0) {
                 videoBtnSet = false;
-
-                if (downloadBtn.current) {
-                    downloadBtn.current.textContent = "Out of Generations";
-                    downloadBtn.current.style.backgroundColor = "#999"; // Gray when disabled
-                }
             }
         };
 
@@ -164,9 +157,8 @@ const redditStory = () => {
             {/*    className="text-input" />*/}
             <button
                 onClick={handleDownload}
-                ref={downloadBtn}
                 disabled={isDownloading || !videoBtnSet}
-                className={`download-button ${isDownloading ? 'disabled' : ''}`}>
+                className={`download-button ${isDownloading ? 'disabled' : ''} ${!videoBtnSet ? 'out-of-generations' : ''}`}>
                 {isDownloading ? 'Generating...' : 'Generate Video'}
             </button>
             <div
