@@ -1,5 +1,6 @@
 ﻿//import { useState } from 'react';
 import { useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 
 import './redditstory.css'; // Import the CSS file
 import './global.css';
