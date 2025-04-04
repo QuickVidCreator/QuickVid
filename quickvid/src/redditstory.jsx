@@ -86,6 +86,7 @@ const redditStory = () => {
             // Notify progress function that the file is received
             setProgressValue(1);
             updateVideoLimit();
+            setVideoLimit(videoLimit - 1);
             setTimeout(() => {
                 setShowProgress(false);
             }, 500);
