@@ -1,5 +1,10 @@
 import { useState } from 'react';
 import './NormalQuiz.css'; // Import the CSS file
+import './global.css';
+
+import { getVideoLimit } from './Functions/userInfo.js';
+import { updateVideoLimit } from './Functions/userInfo.js';
+import { progressBarFunction } from "./Functions/progressBar.js";
 
 const NormalQuiz = () => {
     const [videoUrl, setVideoUrl] = useState('');
@@ -20,7 +25,21 @@ const NormalQuiz = () => {
     const [Question6A, setQuestion6A] = useState(''); // Updated variable name for user input
     const [VideoOutro, setVideoOutro] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
+    let [videoLimit, setVideoLimit] = useState(null);
+    let videoBtnSet = true;
 
+    useEffect(() => {
+        const fetchVideoLimit = async () => {
+            const limit = await getVideoLimit();
+            console.log("Fetched video count:", limit);
+            setVideoLimit(limit);
+            if (limit === 0) {
+                videoBtnSet = false;
+            }
+        };
+
+        fetchVideoLimit();
+    }, []);
     const handleDownload = async () => {
         if (!videoUrl) {
             alert('Please enter a valid YouTube URL');
@@ -42,6 +61,7 @@ const NormalQuiz = () => {
             alert('Please enter a valid video outro');
             return;
         }
+
         setIsDownloading(true);
 
         try {
@@ -98,6 +118,9 @@ const NormalQuiz = () => {
 
     return (
         <div className="quiz-container">
+            <div className="UserInfo">
+                <p>Daily Videos Left: {videoLimit}</p>
+            </div>
             <h1 className="QuestionQuizTitle">6 Question Quiz</h1>
             <h2 className="QATitles">Set the video background</h2>
             <input
@@ -270,9 +293,13 @@ const NormalQuiz = () => {
                 className="text-input" />
             <button
                 onClick={handleDownload}
-                disabled={isDownloading}
-                className={`download-button ${isDownloading ? 'disabled' : ''}`}>
-                {isDownloading ? 'Downloading...' : 'Download Video'}
+                disabled={isDownloading || !videoBtnSet}
+                className={`download-button ${isDownloading ? 'disabled' : ''} ${!videoBtnSet ? 'out-of-generations' : ''}`}>
+                {!videoBtnSet
+                    ? 'Out of Generations'
+                    : isDownloading
+                        ? 'Generating...'
+                        : 'Generate Video'}
             </button>
         </div>
     );
